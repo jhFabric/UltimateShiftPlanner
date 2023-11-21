@@ -63,17 +63,24 @@ events = events_result.get('items', [])
 # OutputPath
 csv_output_file_path = os.path.join(HomeDir, 'tmp', 'laser_shifts.csv')
 
-# Write 2 CSV
+# Filter and sort Events
+filtered_events = []
+for event in events:
+    if 'summary' in event and (event['summary'] == 'Halle 1' or event['summary'] == 'Halle 2'):
+        event_info = {
+            'start': convert_utc_to_cet(event['start']['dateTime']),
+            'end': convert_utc_to_cet(event['end']['dateTime'])
+        }
+        filtered_events.append(event_info)
+
+sorted_events = sorted(filtered_events, key=lambda x: x['start'])
+
+# Write to CSV
 with open(csv_output_file_path, mode='w', newline='') as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=['start', 'end'])
     writer.writeheader()
 
-    for event in events:
-        if 'summary' in event and (event['summary'] == 'Halle 1' or event['summary'] == 'Halle 2'):
-            event_info = {
-                'start': convert_utc_to_cet(event['start']['dateTime']),
-                'end': convert_utc_to_cet(event['end']['dateTime'])
-            }
-            writer.writerow(event_info)
+    for event in sorted_events:
+        writer.writerow(event)
 
 print(f'Events retrieved and saved to {csv_output_file_path}')
