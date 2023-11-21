@@ -63,21 +63,32 @@ events = events_result.get('items', [])
 # OutputPath
 csv_output_file_path = os.path.join(HomeDir, 'tmp', 'laser_shifts.csv')
 
-# Filter and sort Events
-filtered_events = []
+# Function to split date and time
+def split_date_time(datetime_str):
+    date, time = datetime_str.split('T')
+    return date, 'T' + time
+
+# Filter events and prepare for CSV
+formatted_events = []
 for event in events:
     if 'summary' in event and (event['summary'] == 'Halle 1' or event['summary'] == 'Halle 2'):
+        start_date, start_time = split_date_time(convert_utc_to_cet(event['start']['dateTime']))
+        end_date, end_time = split_date_time(convert_utc_to_cet(event['end']['dateTime']))
+        
+        # Assuming start and end dates are the same for each event
         event_info = {
-            'start': convert_utc_to_cet(event['start']['dateTime']),
-            'end': convert_utc_to_cet(event['end']['dateTime'])
+            'day': start_date,
+            'start': start_time,
+            'end': end_time
         }
-        filtered_events.append(event_info)
+        formatted_events.append(event_info)
 
-sorted_events = sorted(filtered_events, key=lambda x: x['start'])
+# Sort events by day and start time
+sorted_events = sorted(formatted_events, key=lambda x: (x['day'], x['start']))
 
 # Write to CSV
 with open(csv_output_file_path, mode='w', newline='') as csv_file:
-    writer = csv.DictWriter(csv_file, fieldnames=['start', 'end'])
+    writer = csv.DictWriter(csv_file, fieldnames=['day', 'start', 'end'])
     writer.writeheader()
 
     for event in sorted_events:
