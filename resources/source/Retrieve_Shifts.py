@@ -35,8 +35,10 @@ credentials = service_account.Credentials.from_service_account_file(
 service = build('calendar', 'v3', credentials=credentials)
 
 ## MAIN00 Create
+
 # Variables
 LaserShifts = []
+
 # User Input
 while True:
     month = input("Enter the month (e.g., '2023-11'): ")
@@ -114,5 +116,6 @@ with open(csv_output_file_path, mode='w', newline='') as csv_file:
         writer.writerow(event)
 
 print(f'Events retrieved and saved to {csv_output_file_path}')
+
 ## Hier weiter. Datenstruktur soll 
 # print(LaserShifts)
