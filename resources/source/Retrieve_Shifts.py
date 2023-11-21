@@ -1,6 +1,5 @@
 import os
 import csv
-# import json
 import calendar
 import pytz
 from google.oauth2 import service_account
@@ -15,17 +14,14 @@ KeyFile = os.path.join(HomeDir, 'resources', 'keys',
                        'ultimate-shift-planning-ea113d5e1166.json')
 Key = KeyFile
 
-# ID of respective Calender
+# Calender
 CALENDAR_NAME = 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com'
 
-# Define the CET timezone
+# CET timezone
 cet = pytz.timezone('CET')
 
-# Function to convert UTC time to CET
-
-
+# convert UTC time to CET
 def convert_utc_to_cet(utc_time_str):
-    # Modified format string to include timezone offset
     utc_time = datetime.strptime(utc_time_str, '%Y-%m-%dT%H:%M:%S%z')
     utc_time = utc_time.astimezone(pytz.utc)
     cet_time = utc_time.astimezone(cet)
@@ -38,18 +34,18 @@ credentials = service_account.Credentials.from_service_account_file(
 service = build('calendar', 'v3', credentials=credentials)
 
 # Main
-# User request: Which month to analyse?
+# User Input
 month = input("Enter the month (e.g., '2023-11'): ")
 year, month_num = map(int, month.split('-'))
 
-# Calculate the last day of the month
+# Last day of the month
 last_day = calendar.monthrange(year, month_num)[1]
 
-# Start and end of the month in UTC
+# Start & end of month in UTC
 start_of_month_utc = f'{month}-01T00:00:00Z'
 end_of_month_utc = f'{month}-{last_day}T23:59:59Z'
 
-# Retrieve events from the calendar
+# Retrieve events
 events_result = service.events().list(
     calendarId=CALENDAR_NAME,
     timeMin=start_of_month_utc,
@@ -59,10 +55,10 @@ events_result = service.events().list(
 
 events = events_result.get('items', [])
 
-# Path for the CSV output
+# OutputPath
 csv_output_file_path = os.path.join(HomeDir, 'tmp', 'laser_shifts.csv')
 
-# Writing to CSV
+# Write 2 CSV
 with open(csv_output_file_path, mode='w', newline='') as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=['start', 'end'])
     writer.writeheader()
