@@ -66,7 +66,21 @@ csv_output_file_path = os.path.join(HomeDir, 'tmp', 'laser_shifts.csv')
 # Function to split date and time
 def split_date_time(datetime_str):
     date, time = datetime_str.split('T')
-    return date, 'T' + time
+    return date, time
+
+# Function to get the name of the weekday
+def get_weekday(date_str):
+    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    return weekdays[date_obj.weekday()]
+
+# Function to calculate the duration between start and end times
+def calculate_duration(start_time, end_time):
+    start = datetime.strptime(start_time, '%H:%M:%S')
+    end = datetime.strptime(end_time, '%H:%M:%S')
+    duration = end - start
+    # Convert duration to a formatted string like 'HH:MM'
+    return f'{duration.seconds // 3600}h {duration.seconds % 3600 // 60}min'
 
 # Filter events and prepare for CSV
 formatted_events = []
@@ -74,12 +88,13 @@ for event in events:
     if 'summary' in event and (event['summary'] == 'Halle 1' or event['summary'] == 'Halle 2'):
         start_date, start_time = split_date_time(convert_utc_to_cet(event['start']['dateTime']))
         end_date, end_time = split_date_time(convert_utc_to_cet(event['end']['dateTime']))
-        
-        # Assuming start and end dates are the same for each event
+
         event_info = {
             'day': start_date,
+            'weekday': get_weekday(start_date),
             'start': start_time,
-            'end': end_time
+            'end': end_time,
+            'time': calculate_duration(start_time, end_time)
         }
         formatted_events.append(event_info)
 
@@ -88,7 +103,7 @@ sorted_events = sorted(formatted_events, key=lambda x: (x['day'], x['start']))
 
 # Write to CSV
 with open(csv_output_file_path, mode='w', newline='') as csv_file:
-    writer = csv.DictWriter(csv_file, fieldnames=['day', 'start', 'end'])
+    writer = csv.DictWriter(csv_file, fieldnames=['day', 'weekday', 'start', 'end', 'time'])
     writer.writeheader()
 
     for event in sorted_events:
