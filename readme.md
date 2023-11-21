@@ -1,4 +1,4 @@
-#Ultimate Shift Planner
+# Ultimate Shift Planner
 
 Tool to retrieve shifts and employees availabilities from Google Calendars
 
