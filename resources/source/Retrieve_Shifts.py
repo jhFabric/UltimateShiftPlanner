@@ -1,4 +1,5 @@
 import os
+import re
 import csv
 import calendar
 import pytz
@@ -35,10 +36,14 @@ service = build('calendar', 'v3', credentials=credentials)
 
 # Main
 # User Input
-month = input("Enter the month (e.g., '2023-11'): ")
-year, month_num = map(int, month.split('-'))
+while True:
+    month = input("Enter the month (e.g., '2023-11'): ")
+    if re.match(r'\d{4}-\d{2}', month) and len(month) == 7:
+        break
+    print('Please repeat in the format jjjj-mm e.g. "2023-11"')
 
 # Last day of the month
+year, month_num = map(int, month.split('-'))
 last_day = calendar.monthrange(year, month_num)[1]
 
 # Start & end of month in UTC
