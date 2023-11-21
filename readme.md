@@ -1,9 +1,11 @@
 # Ultimate Shift Planner
-
+## about
 Tool to retrieve shifts and employees availabilities from Google Calendars  
 
-## Framework
-Python  
+# Framework
+## Python
+PIP / pytz
+
 Google App Scripts  
 Google Cloud Console  
 
