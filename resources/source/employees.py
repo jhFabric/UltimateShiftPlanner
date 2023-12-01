@@ -1,3 +1,5 @@
+## 02.12.2023 
+
 import csv
 import os
 import sys
@@ -19,7 +21,20 @@ def write_csv(file_name, data):
         writer = csv.writer(file)
         writer.writerows(data)
 
+def get_boolean_input(prompt):
+    while True:
+        user_input = input(prompt).strip().lower()
+        if user_input in ['true', 'yes', '1']:
+            return True
+        elif user_input in ['false', 'no', '0']:
             return False
+        elif user_input == 'x':
+            print("Exiting program.")
+            sys.exit()
+        else:
+            print("Invalid input. Please enter true/false or 'x' to exit.")
+
+
 def get_valid_input(prompt, valid_inputs):
     valid_inputs.append('x')  # Add 'x' as a valid input for exiting
     while True:
@@ -33,13 +48,21 @@ def get_valid_input(prompt, valid_inputs):
             print(f"Invalid input. Please enter {', '.join(valid_inputs[:-1])} or 'x' to exit.")
 
 def add_employee():
+    name = input("Name of the employee? ")
+    if name.lower() == 'x':
         print("Exiting program.")
+        sys.exit()
+    cal_id = input("Google Calendar ID? ")
+    if cal_id.lower() == 'x':
         print("Exiting program.")
-    holo = input(
-        "Working at Holocafe? (True/False) ").lower() in ['true', 'yes', '1']
+        sys.exit()
+    laser = get_boolean_input("Working at Lasertag? (True/False) ")
+    holo = get_boolean_input("Working at Holocafe? (True/False) ")
     max_hours = input("How much time does the employee have? ")
-    return [name, cal_id, laser, holo, max_hours]
+    if max_hours.lower() == 'x':
         print("Exiting program.")
+        sys.exit()
+    return [name, cal_id, laser, holo, max_hours]
 
 
 def modify_employee(employees):
@@ -66,15 +89,21 @@ def modify_employee(employees):
 
 def delete_employee(employees):
     print("\n".join(f"{idx+1}. {emp[0]}" for idx, emp in enumerate(employees)))
-    emp_num = int(get_valid_input("Enter the number of the employee to delete: ",
-                                  [str(i) for i in range(1, len(employees) + 1)])) - 1
+    emp_num_input = get_valid_input("Enter the number of the employee to delete or 'x' to exit: ",
+                                    [str(i) for i in range(1, len(employees) + 1)])
+
+    if emp_num_input.lower() == 'x':
+        print("Exiting program.")
+        sys.exit()
+
+    emp_num = int(emp_num_input) - 1
     del employees[emp_num]
 
 
 def main():
     # Use the global csvPath variable
     employees = read_csv(csvPath)
-    headers = employees.pop(0) if employees else ['Name', 'Cal ID', 'Laser', 'Holo', 'MaxHours']
+    headers = employees.pop(0) if employees else ['name', 'cal-id', 'laser', 'holo', 'max_hours']
 
     while True:
         action = get_valid_input("Do you want to add, modify or delete an employee from the list? (a) Add; (b) modify; (c) delete; (x) exit: ", ['a', 'b', 'c'])

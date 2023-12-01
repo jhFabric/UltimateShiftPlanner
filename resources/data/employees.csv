@@ -1,4 +1,4 @@
-Name, Cal ID, laser, Holo, MaxHours
+name, cal-id, laser, holo, maxHours
 Jonas Heinen,66b162851aff5b45792c0103901adb3611862109d9931f56ebae652066cb6ff1@group.calendar.google.com,True,True,60
 Test Emplyee 1,266622f2caaad34ae870a80f7a14ab7d3c78f68b46659adf55f24aadaeacbc39@group.calendar.google.com,True,False,40
 Test Employee 2,100182d791464d23e5c7b8e1693b34cfcb12567dedfa2c59775fbe6f3778930e@group.calendar.google.com,False,True,40
