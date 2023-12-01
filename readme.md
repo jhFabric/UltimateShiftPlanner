@@ -7,6 +7,7 @@ Tool to retrieve shifts and employees availabilities from Google Calendars
 pip / pytz
 pip / google-auth
 pip / google-api-python-client
+pip / google-auth-httplib2
 
 
 Google App Scripts  
