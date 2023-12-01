@@ -1,25 +1,33 @@
 import csv
 import os
+import sys  # Import sys for the sys.exit() function
+
+# Set Base directory # Initialize CSV file
+ScriptPath = os.path.abspath(__file__)
+HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
+csvPath = os.path.join(HomeDir,'resources', 'data', 'employees.csv')
 
 def read_csv(file_name):
     with open(file_name, 'r') as file:
         reader = csv.reader(file)
         return list(reader)
 
-
 def write_csv(file_name, data):
     with open(file_name, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data)
 
-
 def get_valid_input(prompt, valid_inputs):
     while True:
         user_input = input(prompt).strip().lower()
-        if user_input in valid_inputs:
+        if user_input == 'x':
+            print("Exiting program.")
+            sys.exit()  # Exit the program
+        elif user_input in valid_inputs or user_input == 'x':
             return user_input
         else:
-            print(f"Invalid input. Please enter {', '.join(valid_inputs)}.")
+            print(f"Invalid input. Please enter {', '.join(valid_inputs)} or 'x' to exit.")
+
 
 
 def add_employee():
@@ -63,13 +71,11 @@ def delete_employee(employees):
 
 
 def main():
-    file_name = 'employees.csv'
-    employees = read_csv(file_name)
-    headers = employees.pop(0)
+    employees = read_csv(csvPath)
+    headers = employees.pop(0) if employees else ['Name', 'Cal ID', 'Laser', 'Holo', 'MaxHours']
 
     while True:
-        action = get_valid_input(
-            "Do you want to add, modify or delete an employee from the list? (a) Add; (b) modify; (c) delete: ", ['a', 'b', 'c'])
+        action = get_valid_input("Do you want to add, modify or delete an employee from the list? (a) Add; (b) modify; (c) delete; (x) exit: ", ['a', 'b', 'c'])
         if action == 'a':
             employees.append(add_employee())
         elif action == 'b':
@@ -77,14 +83,12 @@ def main():
         elif action == 'c':
             delete_employee(employees)
 
-        continue_choice = get_valid_input(
-            "Do you wish to change, add, or modify something else? (yes/no): ", ['yes', 'no'])
+        continue_choice = get_valid_input("Do you wish to change, add, or modify something else? (yes/no): ", ['yes', 'no'])
         if continue_choice == 'no':
             break
 
     employees.insert(0, headers)
-    write_csv(file_name, employees)
-
+    write_csv(csvPath, employees)
 
 if __name__ == "__main__":
     main()
