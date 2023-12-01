@@ -19,6 +19,7 @@ def write_csv(file_name, data):
         writer = csv.writer(file)
         writer.writerows(data)
 
+            return False
 def get_valid_input(prompt, valid_inputs):
     valid_inputs.append('x')  # Add 'x' as a valid input for exiting
     while True:
@@ -32,14 +33,13 @@ def get_valid_input(prompt, valid_inputs):
             print(f"Invalid input. Please enter {', '.join(valid_inputs[:-1])} or 'x' to exit.")
 
 def add_employee():
-    name = input("Name of the employee? ")
-    cal_id = input("Google Calendar ID? ")
-    laser = input(
-        "Working at Lasertag? (True/False) ").lower() in ['true', 'yes', '1']
+        print("Exiting program.")
+        print("Exiting program.")
     holo = input(
         "Working at Holocafe? (True/False) ").lower() in ['true', 'yes', '1']
     max_hours = input("How much time does the employee have? ")
     return [name, cal_id, laser, holo, max_hours]
+        print("Exiting program.")
 
 
 def modify_employee(employees):
