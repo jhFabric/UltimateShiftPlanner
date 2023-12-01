@@ -1,11 +1,13 @@
 import csv
 import os
-import sys  # Import sys for the sys.exit() function
+import sys
 
 # Set Base directory # Initialize CSV file
 ScriptPath = os.path.abspath(__file__)
 HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
-csvPath = os.path.join(HomeDir,'resources', 'data', 'employees.csv')
+csvPath = os.path.join(HomeDir, 'resources', 'data', 'employees.csv')
+print("CSV Path:", csvPath)
+
 
 def read_csv(file_name):
     with open(file_name, 'r') as file:
@@ -18,17 +20,16 @@ def write_csv(file_name, data):
         writer.writerows(data)
 
 def get_valid_input(prompt, valid_inputs):
+    valid_inputs.append('x')  # Add 'x' as a valid input for exiting
     while True:
         user_input = input(prompt).strip().lower()
         if user_input == 'x':
             print("Exiting program.")
             sys.exit()  # Exit the program
-        elif user_input in valid_inputs or user_input == 'x':
+        elif user_input in valid_inputs:
             return user_input
         else:
-            print(f"Invalid input. Please enter {', '.join(valid_inputs)} or 'x' to exit.")
-
-
+            print(f"Invalid input. Please enter {', '.join(valid_inputs[:-1])} or 'x' to exit.")
 
 def add_employee():
     name = input("Name of the employee? ")
@@ -71,6 +72,7 @@ def delete_employee(employees):
 
 
 def main():
+    # Use the global csvPath variable
     employees = read_csv(csvPath)
     headers = employees.pop(0) if employees else ['Name', 'Cal ID', 'Laser', 'Holo', 'MaxHours']
 
