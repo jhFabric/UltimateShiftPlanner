@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ultimate-shift-planning",
+  "private_key_id": "a1f50922098971d6b8691b12fca98c280814fa41",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCUkj/aw37phl9m\nr8Vc6ovbzCvV9h85HAo/TvpITM3BZkIm5/xDZ79PnfT2JkfwQd2jkYKlNtMWmiUB\nGgUS91t4fQLkQt4tig+BKUDpgZyXeNUxDnQbdxW0aDKtZZcQLkT6KqnJkkelOHs+\nTRm5jMuSrui/2XN4dHYkopfyZUFqKQ21TTl53jj1vm7KGux3qVpTW/LKAJ1ZU/ki\nnk74g7jiArmojoSAz/EdaBQRwuCGRRD0i4M8RRhiVXDglv+vR15H1KvlxojXs+fd\n8xDPkPHY88wxddpjZubFxzA+SbV/KQ5+i2qRxYI+ZA8wnKqK8doKsgn4NFH3UwRQ\ndemqSxo9AgMBAAECggEABuZWMVRwFdZ1TUP0pD30nKf6JtpiilOEn/qMvI6r5Tiu\nHKJG8KFw53i+5NnpGt264OsJIx+X74jdQZRsr7wNmIZOZqflVhOUk0DFdeKx+/CI\nZBoXUc7haEAI5HfJ63OJUAiVsIRgL+qJgglGHHwkWHhSMQC0sF97kh7RSYL4Jf7W\ncUArqkIbI/oKpabsrdf78NMVSkY4nCBOiX8dW/1GAhD5SIwC8xhhgon4/zywmjTC\nUuWUcSDDtu4LVyoT0Qc0kLl2v8IBfWrH/OqnSi/YK5J6wGTKvJMJYepTJjGZXFPu\nypqPAoqdcuz/fu+sny7oGTk14lvU3FpySU1nbiV3CQKBgQDPN/HBqPuX9ZBJKL14\nizYJNGEgH5W66deh5G5v4P3MQDGpKgNujhZW8aaGT8rbUhAgwZS0oeKq4JJpkiQ0\nSji4h+K6TLIO7posbFoXPIxvNGtsT2dXBA8aBYuY09h0CD7ShTFh46zboe9weBgs\nt0nqmsLIiG1sWY6LPKNKS8dnaQKBgQC3i+uLPNcn/hVLsgqGtPx+HZxnvnvw2jdO\ngT79E2smK7Y3rnR5XabfIMKNlC64YkpbKyu9nbl9QSDlJ1fxjSmY6F17fKgtDaGQ\n6Kb/Q+ZKk1HAhEMHnuwVtSI4Ldq0rqYtmhgaH/ADBm0kA8o400vPRIkAjYqOfUga\nP7vg/ix1tQKBgQCb77eoSqf6dLr9swDSQ8CIMLieWeZtYCf7FlHdM20KVYyJhqpK\nefZpuzPbgxRe82RbohFr1R8kBBdqBqXkC66ffvKpy6l6/ydaIrexIMl1rfbg7OgR\nXWaX6HBis5kByGquNbkxtwmPxk7PTjCzBcNEHu5RxgjCLqrMMPeYo2oNcQKBgQCU\nsUFsVylmOKw/2kg0wMIb2Rkv4ly9zcooSwQgOW8ASUEg8q9g8sGQ2RVDZNxEezwJ\nh3uz7Oar1es0OR9BjD46pWO1+lKzzOsqXY+MFBGoMJh2Aa/bqJ9RJqBGKr+WyDXP\nk5oa7+ycRsR7/KYCSwqLKtZiIEgzDsMuoJsvtjmGUQKBgGGodcc3Vzb28lFVMNa0\njiWWUINgJ8NUuDcWgP9BlrUEb+JhpRZRqcFJyGFRHyAVo/NKpzm8qczklOpZXDji\nu5j6B8svQMMKahFTE8I132hBuWusaQVfAzOmp1zfnDLVqTxtbI2pj675mjxFEuye\nm6C34LKhGwM8v9DjP+rXrN3k\n-----END PRIVATE KEY-----\n",
+  "client_email": "admincalendar@ultimate-shift-planning.iam.gserviceaccount.com",
+  "client_id": "114335325113889259854",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/admincalendar%40ultimate-shift-planning.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
