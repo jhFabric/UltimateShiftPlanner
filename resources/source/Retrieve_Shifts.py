@@ -12,7 +12,6 @@ from datetime import datetime
 # Set Base directory # Call Credentials JSON
 ScriptPath = os.path.abspath(__file__)
 HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
-
 Key = os.path.join(HomeDir, 'resources', 'keys',
                        'ultimate-shift-planning-a1f509220989.json')
 
@@ -47,14 +46,19 @@ def get_weekday(date_str):
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     return weekdays[date_obj.weekday()]
 
-# Function to calculate the duration between start and end times
+# Function to calculate the duration between start and end times and return it in decimal hours
 def calculate_duration(start_time, end_time):
     start = datetime.strptime(start_time, '%H:%M:%S')
     end = datetime.strptime(end_time, '%H:%M:%S')
     duration = end - start
-    # Convert duration to a formatted string like 'HH:MM'
-    return f'{duration.seconds // 3600}h {duration.seconds % 3600 // 60}min'
+    # Calculate total duration in minutes
+    total_minutes = duration.seconds // 60
+    # Convert minutes to decimal hours (1 hour = 60 minutes)
+    decimal_hours = total_minutes / 60
+    return round(decimal_hours, 2)  # round to 2 decimal places
 
+
+# Function to parse and proceed the calendar # Creates CSV
 def process_calendar(calendar_id, event_names, csv_filename):
     events_result = service.events().list(
         calendarId=calendar_id,
@@ -93,12 +97,8 @@ def process_calendar(calendar_id, event_names, csv_filename):
 
     print(f'Events from {calendar_id} retrieved and saved to {csv_output_file_path}')
 
-## MAIN00 Create
+## User Input
 
-# Variables
-LaserShifts = []
-
-# User Input
 while True:
     month = input("Enter the month (e.g., '2023-11'): ")
     if re.match(r'\d{4}-\d{2}', month) and len(month) == 7:
@@ -113,6 +113,7 @@ last_day = calendar.monthrange(year, month_num)[1]
 start_of_month_utc = f'{month}-01T00:00:00Z'
 end_of_month_utc = f'{month}-{last_day}T23:59:59Z'
 
+# Function call
 process_calendar(CALENDAR_LASER_ID, ['Halle 1', 'Halle 2'], 'laser_shifts.csv')
 process_calendar(CALENDAR_HOLO_ID, ['Cafe 1', 'Cafe 2'], 'holo_shifts.csv')
 
