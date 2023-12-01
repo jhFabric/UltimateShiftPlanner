@@ -1,5 +1,3 @@
-## 01.12.2023
-
 import os
 import re
 import csv
@@ -9,22 +7,24 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
 
+## 01.12.2023
+
 ## Directories & Network
 
 # Set Base directory # Call Credentials JSON
 ScriptPath = os.path.abspath(__file__)
 HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
 
-KeyFile = os.path.join(HomeDir, 'resources', 'keys',
-                       'ultimate-shift-planning-ea113d5e1166.json')
-Key = KeyFile
-
 ## Retrieve Data from Mitarbeiter Kalender in Google
 
-# Calender
-CALENDAR_NAME = 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com'
-# CET timezone
+# Calendars
+CALENDAR_LASER_ID = 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com'
+CALENDAR_HOLO_ID = 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com'
+
+# Constants 
 cet = pytz.timezone('CET')
+Key = os.path.join(HomeDir, 'resources', 'keys',
+                       'ultimate-shift-planning-ea113d5e1166.json')
 # convert UTC time to CET
 def convert_utc_to_cet(utc_time_str):
     utc_time = datetime.strptime(utc_time_str, '%Y-%m-%dT%H:%M:%S%z')
@@ -35,6 +35,7 @@ def convert_utc_to_cet(utc_time_str):
 credentials = service_account.Credentials.from_service_account_file(
     Key, scopes=['https://www.googleapis.com/auth/calendar.readonly'])
 service = build('calendar', 'v3', credentials=credentials)
+
 
 ## MAIN00 Create
 
@@ -58,7 +59,7 @@ end_of_month_utc = f'{month}-{last_day}T23:59:59Z'
 
 # Retrieve events
 events_result = service.events().list(
-    calendarId=CALENDAR_NAME,
+    calendarId=CALENDAR_LASER_ID,
     timeMin=start_of_month_utc,
     timeMax=end_of_month_utc,
     singleEvents=True

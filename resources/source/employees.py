@@ -1,8 +1,8 @@
-## 01.12.2023 
-
 import csv
 import os
 import sys
+
+## 01.12.2023 
 
 # Set Base directory # Initialize CSV file
 ScriptPath = os.path.abspath(__file__)
@@ -10,6 +10,7 @@ HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
 csvPath = os.path.join(HomeDir, 'resources', 'data', 'employees.csv')
 print("CSV Path:", csvPath)
 
+## Functions
 
 def read_csv(file_name):
     with open(file_name, 'r') as file:
@@ -99,6 +100,7 @@ def delete_employee(employees):
     emp_num = int(emp_num_input) - 1
     del employees[emp_num]
 
+##Main
 
 def main():
     # Use the global csvPath variable
