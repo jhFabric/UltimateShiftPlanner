@@ -7,7 +7,8 @@ from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 
 # Constants and configurations
-HOME_DIR = "UltimateShiftPlanner"
+ScriptPath = os.path.abspath(__file__)
+HOME_DIR = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
 RESOURCES_DIR = os.path.join(HOME_DIR, "resources")
 KEYS_DIR = os.path.join(RESOURCES_DIR, "keys")
 DATA_DIR = os.path.join(RESOURCES_DIR, "data")
@@ -19,6 +20,7 @@ SERVICE_ACCOUNT_FILE = os.path.join(KEYS_DIR, 'ultimate-shift-planning-a1f509220
 
 # Function to read CSV file and return data as a list of lists
 def read_csv(file_path):
+    print("Attempting to read from:", file_path)
     with open(file_path, 'r', newline='', encoding='utf-8') as file:
         reader = csv.reader(file)
         return list(reader)
@@ -89,9 +91,20 @@ def write_csv(file_path, data):
 
 # Main Program
 def main():
+
     # Read shifts and employee data
     shifts = {file: read_csv(os.path.join(TMP_DIR, file)) for file in SHIFT_FILES}
     employees = read_csv(EMPLOYEES_FILE)
+
+    # Initialize emp_output with additional columns, skipping the header row
+    emp_output = [employees[0] + ['work_hours', 'remaining_hours']]  # Include header with new columns
+    for emp in employees[1:]:  # Start from the second row to skip the header
+        try:
+            max_hours = float(emp[4])
+        except ValueError:
+            print(f"Error converting max_hours to float for employee: {emp}")
+            continue
+        emp_output.append(emp + [0, max_hours])  # Add work_hours (0) and remaining_hours (equal to max_hours)
 
     # Connect to Google Calendar
     service = google_calendar_service()
@@ -106,7 +119,6 @@ def main():
         write_csv(output_file, shifts[shift_file])
 
     # Prepare and write employee output
-    emp_output = [emp[:5] + [emp[5], emp[4], emp[6]] for emp in employees]  # Reformat employee data
     write_csv(os.path.join(TMP_DIR, "emp_output.csv"), emp_output)
 
 if __name__ == "__main__":
