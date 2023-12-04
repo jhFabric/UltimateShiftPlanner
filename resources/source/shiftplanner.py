@@ -5,6 +5,7 @@ import calendar
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
+from dateutil import parser
 
 # Constants and configurations
 ScriptPath = os.path.abspath(__file__)
@@ -27,24 +28,60 @@ def read_csv(file_path):
     with open(file_path, 'r', newline='', encoding='utf-8') as file:
         reader = csv.reader(file)
         data = list(reader)
-        print(f"Data read from {file_path}:", data)  # Debug print
+#        print(f"Data read from {file_path}:", data)  # Debug print
         return data
 
 # Function to connect to Google Calendar API
-
-
 def google_calendar_service():
     credentials = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     service = build('calendar', 'v3', credentials=credentials)
     return service
 
+def fetch_and_write_employee_events(service, employees):
+    # Define the date range for February 2024
+    start_date = datetime(2024, 2, 1, 0, 0, 0)  # Start of February
+    end_date = datetime(2024, 3, 1, 0, 0, 0)  # Start of March (end of February)
+
+    for employee in employees[1:]:  # Skip header
+        print(f"Current employee data: {employee}")  # Debug print
+        calendar_id = employee[1].strip()
+        employee_name = employee[0].strip()
+        output_file_path = os.path.join(TMP_DIR, f"{employee_name}_events.csv")
+
+        events_result = service.events().list(
+            calendarId=calendar_id,
+            timeMin=start_date.isoformat() + 'Z',
+            timeMax=end_date.isoformat() + 'Z',
+            singleEvents=True,
+            orderBy='startTime'
+        ).execute()
+        events = events_result.get('items', [])
+
+        with open(output_file_path, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(['day', 'weekday', 'start', 'end', 'time', 'shift'])  # Header
+
+            for event in events:
+                start_str = event['start'].get('dateTime', event['start'].get('date'))
+                end_str = event['end'].get('dateTime', event['end'].get('date'))
+                start_dt = datetime.fromisoformat(start_str)
+                end_dt = datetime.fromisoformat(end_str)
+
+                day = start_dt.strftime('%Y-%m-%d')
+                weekday = start_dt.strftime('%A')
+                start_time = start_dt.strftime('%H:%M:%S')
+                end_time = end_dt.strftime('%H:%M:%S')
+                duration = (end_dt - start_dt).total_seconds() / 3600  # Duration in hours
+                event_name = event.get('summary', 'No Title')
+
+                writer.writerow([day, weekday, start_time, end_time, duration, event_name])
+
+
 # Function to check employee availability
-
-
 def is_employee_available(service, employee, shift_start, shift_end):
     # Debug print to confirm function is called
-    print(f"Checking availability for employee: {employee[0]}")
+#    print(f"Checking availability for employee: {employee[0]}")
 
     # Convert shift times to RFC3339 timestamp
     shift_start_rfc3339 = shift_start.isoformat() + 'Z'
@@ -63,35 +100,26 @@ def is_employee_available(service, employee, shift_start, shift_end):
         return False
 
     events = events_result.get('items', [])
-    print(f"Events found for {employee[0]}: {len(events)}")  # Debug print
+#    print(f"Events found for {employee[0]}: {len(events)}")  # Debug print
 
-    events = events_result.get('items', [])
-
-    print(f"Checking availability for employee: {employee[0]} for shift {shift_start} to {shift_end}")
     for event in events:
         event_start_str = event['start'].get('dateTime', event['start'].get('date'))
         event_end_str = event['end'].get('dateTime', event['end'].get('date'))
         event_start = datetime.fromisoformat(event_start_str)
         event_end = datetime.fromisoformat(event_end_str)
 
-        print(f"Checking event: {event.get('summary', 'No Title')}, Start: {event_start}, End: {event_end}")
+#        print(f"Checking event: {event.get('summary', 'No Title')}, Start: {event_start}, End: {event_end}")
 
         # Check if event is blocking
         if "block" in event.get('summary', '').lower():
-            print(f"Blocked by event: {event['summary']} for {employee[0]}")
-            return False
+            if event_start < shift_end and event_end > shift_start:
+                print(f"Blocked by event: {event['summary']} for {employee[0]}")
+                return False
 
-        # Check if the event spans the entire shift duration or partially overlaps
-        if event_start <= shift_start and event_end >= shift_end:
-            if event['summary'].lower() == employee[0].lower():
-                print(f"Preferred shift found: {event['summary']} for {employee[0]}")
-                return True
-            print(f"Available for shift: {shift_start} to {shift_end}, found event: {event['summary']} for {employee[0]}")
-            return True
+    # If no blocking event is found, employee is available
+    return True
 
-    print(f"No suitable event found for shift: {shift_start} to {shift_end} for {employee[0]}")
-    return False  # No suitable events found
-
+# Function to assign shifts
 # Function to assign shifts
 def assign_shifts(shifts, employees, service):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
@@ -109,12 +137,22 @@ def assign_shifts(shifts, employees, service):
 
             shift_assigned = False
             for employee in employees[1:]:  # Skip header row
+                # Debug print to check the structure of each employee
+                print(f"Employee data in assign_shifts: {employee}")
+
                 if (employee[2] == '1' and shift_file == "laser_shifts.csv") or (employee[3] == '1' and shift_file == "holo_shifts.csv"):
                     print(f"Checking employee: {employee[0]} for shift {shift_start_str} to {shift_end_str}")
                     if is_employee_available(service, employee, shift_start, shift_end):
                         shift[-1] = employee[0]
-                        employee[5] = str(float(employee[5]) + shift_duration)
-                        employee[6] = str(float(employee[6]) - shift_duration)
+
+                        # Additional check for the length of the employee list
+                        if len(employee) >= 8:
+                            print(f"Before update - Work hours: {employee[6]} (Type: {type(employee[6])}), Remaining hours: {employee[7]} (Type: {type(employee[7])})")
+                            employee[6] = str(float(employee[6]) + shift_duration)  # Update work_hours
+                            employee[7] = str(float(employee[7]) - shift_duration)  # Update remaining_hours
+                        else:
+                            print(f"Error: Employee list does not have the expected number of elements. Employee data: {employee}")
+
                         assigned_shifts += 1
                         print(f"Assigned {shift} to {employee[0]}")
                         shift_assigned = True
@@ -126,9 +164,7 @@ def assign_shifts(shifts, employees, service):
 
     print(f"Total shifts processed: {assigned_shifts}/{total_shifts}")
 
-# Function to write data back to CSV
-
-
+# Function to write data to CSV
 def write_csv(file_path, data):
     with open(file_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
@@ -159,8 +195,14 @@ def main():
     # Connect to Google Calendar
     service = google_calendar_service()
 
+    # Fetch and write employee events
+    fetch_and_write_employee_events(service, employees)
+
+    for emp in emp_output[1:]:  # Debug print to check structure
+        print(f"Employee in emp_output before assign_shifts: {emp}")
+
     # Assign shifts
-    assign_shifts(shifts, employees, service)
+    assign_shifts(shifts, emp_output, service)
 
     # Write updated data back to CSV files
     for shift_file in SHIFT_FILES:

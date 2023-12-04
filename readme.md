@@ -8,6 +8,7 @@ pip / pytz
 pip / google-auth
 pip / google-api-python-client
 pip / google-auth-httplib2
+pip / python-dateutil
 
 
 Google App Scripts  
