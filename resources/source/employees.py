@@ -26,15 +26,14 @@ def get_boolean_input(prompt):
     while True:
         user_input = input(prompt).strip().lower()
         if user_input in ['true', 'yes', '1']:
-            return True
+            return '1'
         elif user_input in ['false', 'no', '0']:
-            return False
+            return '0'
         elif user_input == 'x':
             print("Exiting program.")
             sys.exit()
         else:
             print("Invalid input. Please enter true/false or 'x' to exit.")
-
 
 def get_valid_input(prompt, valid_inputs):
     valid_inputs.append('x')  # Add 'x' as a valid input for exiting
@@ -79,14 +78,11 @@ def modify_employee(employees):
     elif modification_choice == 'b':
         emp_to_modify[1] = input("New Google Calendar ID: ")
     elif modification_choice == 'c':
-        emp_to_modify[2] = input(
-            "Working at Lasertag? (True/False) ").lower() in ['true', 'yes', '1']
+        emp_to_modify[2] = get_boolean_input("Working at Lasertag? (True/False) ")
     elif modification_choice == 'd':
-        emp_to_modify[3] = input(
-            "Working at Holocafe? (True/False) ").lower() in ['true', 'yes', '1']
+        emp_to_modify[3] = get_boolean_input("Working at Holocafe? (True/False) ")
     elif modification_choice == 'e':
         emp_to_modify[4] = input("New MaxHours: ")
-
 
 def delete_employee(employees):
     print("\n".join(f"{idx+1}. {emp[0]}" for idx, emp in enumerate(employees)))

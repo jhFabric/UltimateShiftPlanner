@@ -80,18 +80,17 @@ def fetch_and_write_employee_events(service, employees):
 
 # Function to check employee availability
 def is_employee_available(service, employee, shift_start, shift_end):
-    # Debug print to confirm function is called
-#    print(f"Checking availability for employee: {employee[0]}")
-
-    # Convert shift times to RFC3339 timestamp
-    shift_start_rfc3339 = shift_start.isoformat() + 'Z'
-    shift_end_rfc3339 = shift_end.isoformat() + 'Z'
+    # Ensure shift_start and shift_end are offset-aware
+    if shift_start.tzinfo is None or shift_start.tzinfo.utcoffset(shift_start) is None:
+        shift_start = parser.parse(shift_start.isoformat() + 'Z')
+    if shift_end.tzinfo is None or shift_end.tzinfo.utcoffset(shift_end) is None:
+        shift_end = parser.parse(shift_end.isoformat() + 'Z')
 
     try:
         events_result = service.events().list(
             calendarId=employee[1],  # Assuming employee['cal-id'] is at index 1
-            timeMin=shift_start_rfc3339,
-            timeMax=shift_end_rfc3339,
+            timeMin=shift_start.isoformat(),
+            timeMax=shift_end.isoformat(),
             singleEvents=True,
             orderBy='startTime'
         ).execute()
@@ -100,15 +99,12 @@ def is_employee_available(service, employee, shift_start, shift_end):
         return False
 
     events = events_result.get('items', [])
-#    print(f"Events found for {employee[0]}: {len(events)}")  # Debug print
 
     for event in events:
         event_start_str = event['start'].get('dateTime', event['start'].get('date'))
         event_end_str = event['end'].get('dateTime', event['end'].get('date'))
-        event_start = datetime.fromisoformat(event_start_str)
-        event_end = datetime.fromisoformat(event_end_str)
-
-#        print(f"Checking event: {event.get('summary', 'No Title')}, Start: {event_start}, End: {event_end}")
+        event_start = datetime.fromisoformat(event_start_str).replace(tzinfo=pytz.utc)  # Ensure offset-aware with UTC
+        event_end = datetime.fromisoformat(event_end_str).replace(tzinfo=pytz.utc)  # Ensure offset-aware with UTC
 
         # Check if event is blocking
         if "block" in event.get('summary', '').lower():
@@ -119,7 +115,7 @@ def is_employee_available(service, employee, shift_start, shift_end):
     # If no blocking event is found, employee is available
     return True
 
-# Function to assign shifts
+
 # Function to assign shifts
 def assign_shifts(shifts, employees, service):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
