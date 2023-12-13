@@ -110,13 +110,12 @@ def is_employee_available(service, employee, shift_start, shift_end):
 
     return True
 
-# Function to assign shifts
 def assign_shifts(shifts, employees, service):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
     assigned_shifts = 0
 
     for shift_file in SHIFT_FILES:
-        for shift in shifts[shift_file][1:]:
+        for shift in shifts[shift_file][1:]:  # Skip header row
             shift_date_str, _, shift_start_str, shift_end_str, _ = shift[:5]
             shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
             shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
@@ -124,13 +123,19 @@ def assign_shifts(shifts, employees, service):
             shift_duration = float(shift[4])
 
             shift_assigned = False
-            for employee in employees[1:]:
+            for index, employee in enumerate(employees[1:], start=1):  # Start index from 1 to adjust for header
                 if (employee[2] == '1' and shift_file == "laser_shifts.csv") or (employee[3] == '1' and shift_file == "holo_shifts.csv"):
                     if is_employee_available(service, employee, shift_start, shift_end):
                         shift[-1] = employee[0]
-                        if len(employee) >= 8:
-                            employee[6] = str(float(employee[6]) + shift_duration)
-                            employee[7] = str(float(employee[7]) - shift_duration)
+
+                        # Update hours in emp_output
+                        work_hours = float(employee[6]) + shift_duration
+                        remaining_hours = float(employee[7]) - shift_duration
+
+                        # Update the employee data in emp_output
+                        employees[index][6] = str(work_hours)
+                        employees[index][7] = str(remaining_hours)
+
                         assigned_shifts += 1
                         shift_assigned = True
                         break
