@@ -123,7 +123,6 @@ def is_employee_available(service, employee, shift_start, shift_end):
 def assign_shifts(shifts, emp_open, service, employees):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
     assigned_shifts = 0
-
     for shift_file in SHIFT_FILES:
         for shift in shifts[shift_file][1:]:  # Skip header row
             shift_date_str, _, shift_start_str, shift_end_str, shift_name = shift[:5]
