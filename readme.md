@@ -1,6 +1,13 @@
 # Ultimate Shift Planner
 ## about
-Tool to retrieve shifts and employees availabilities from Google Calendars  
+Tool to retrieve shifts and employees availabilities from Google Calendars
+
+## Manual:
+# Run the UltimateShift
+
+1. Run UltimateShiftPlanner.exe from /dist
+2. Choose the option you need and follow the instructions.
+3. 
 
 # Framework
 ## Python

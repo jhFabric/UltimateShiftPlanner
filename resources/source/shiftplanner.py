@@ -14,6 +14,7 @@ RESOURCES_DIR = os.path.join(HOME_DIR, "resources")
 KEYS_DIR = os.path.join(RESOURCES_DIR, "keys")
 DATA_DIR = os.path.join(RESOURCES_DIR, "data")
 TMP_DIR = os.path.join(HOME_DIR, "tmp")
+OUTPUT_DIR = os.path.join(HOME_DIR, "output")
 SHIFT_FILES = ["laser_shifts.csv", "holo_shifts.csv"]
 EMPLOYEES_FILE = os.path.join(DATA_DIR, "employees.csv")
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -80,12 +81,20 @@ def fetch_and_write_employee_events(service, employees, month, year):
 def prepare_employee_data(employees):
     emp_open = [['Name', 'work_hours', 'remaining_hours']]
     for emp in employees[1:]:
+        print("Debug - Employee data:", emp)  # Debug print
+
         try:
             remaining_hours = float(emp[4])  # Convert to float as it will be used for calculations
         except ValueError:
+            print("Error converting remaining hours to float for:", emp)  # Error print
             continue  # Skip if conversion fails
+        except IndexError:
+            print("Error: Not enough data in row for:", emp)  # Error print for missing data
+            continue  # Skip if row is short
+
         emp_open.append([emp[0], 0.00, remaining_hours])  # Initialize work_hours with 0.00
     return emp_open
+
 
 # Function to check employee availability
 def is_employee_available(service, employee, shift_start, shift_end):
@@ -124,8 +133,9 @@ def assign_shifts(shifts, emp_open, service, employees):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
     assigned_shifts = 0
     for shift_file in SHIFT_FILES:
+
         for shift in shifts[shift_file][1:]:  # Skip header row
-            shift_date_str, _, shift_start_str, shift_end_str, shift_name = shift[:5]
+            shift_date_str, _, shift_start_str, shift_end_str, _, shift_name = shift[:6]
             shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
             weekday = shift_date.strftime('%A')  # Get weekday from the date
             shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
@@ -168,6 +178,7 @@ def write_csv(file_path, data):
 def main():
     # Read shifts and employee data
     shifts = {file: read_csv(os.path.join(TMP_DIR, file)) for file in SHIFT_FILES}
+    # print("Debug - Shifts dictionary content:", shifts)
 
     # Extract month and year from the first data row of either shift file
     first_shift_date_str = shifts['holo_shifts.csv'][1][0]  # Assuming the date is in the first column
@@ -191,11 +202,11 @@ def main():
     for shift_file in SHIFT_FILES:
         month_name = calendar.month_name[shift_month].lower()
         output_file = os.path.join(
-            TMP_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
+            OUTPUT_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
         write_csv(output_file, shifts[shift_file])
 
     # Prepare and write employee output using emp_open data structure
-    write_csv(os.path.join(TMP_DIR, "emp_output.csv"), emp_open)
+    write_csv(os.path.join(OUTPUT_DIR, "emp_output.csv"), emp_open)
 
 if __name__ == "__main__":
     main()

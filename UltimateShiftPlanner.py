@@ -22,7 +22,7 @@ def main():
         print("1) Schichten für Monat ziehen")
         print("2) Schichten für aktuell gewählten Monat erstellen")
         print("3) Mitarbeiter ändern")
-        print("q) UltimateShiftPlanner beenden\n")
+        print("x) UltimateShiftPlanner beenden\n")
 
         choice = input("Enter your choice: ").lower()
 
