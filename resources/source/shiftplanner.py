@@ -139,45 +139,53 @@ def assign_shifts(shifts, emp_open, service, employees):
     assigned_shifts = 0
     employee_queue = deque(range(1, len(emp_open)))  # Queue of employee indices, starting from 1 to skip header
 
-    for shift_file in SHIFT_FILES:
-        for shift in shifts[shift_file][1:]:  # Skip header row
-            shift_date_str, _, shift_start_str, shift_end_str, _, shift_name = shift[:6]
-            shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
-            weekday = shift_date.strftime('%A')
-            shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
-            shift_end = shift_date + timedelta(hours=int(shift_end_str.split(":")[0]), minutes=int(shift_end_str.split(":")[1]))
-            shift_duration = float(shift[4])
+    # Create a copy of the shifts for processing
+    shifts_copy = {file: list(shifts[file]) for file in SHIFT_FILES}
 
-            shift_assigned = False
-            attempted_employees = set()
+    while any(len(shifts_copy[file]) > 1 for file in SHIFT_FILES):
+        for shift_file in SHIFT_FILES:
+            if len(shifts_copy[shift_file]) > 1:  # Check if there are shifts left in the file
+                shift = shifts_copy[shift_file].pop(1)  # Process the first shift from the copy
+                shift_date_str, _, shift_start_str, shift_end_str, _, shift_name = shift[:6]
+                shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
+                weekday = shift_date.strftime('%A')
+                shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
+                shift_end = shift_date + timedelta(hours=int(shift_end_str.split(":")[0]), minutes=int(shift_end_str.split(":")[1]))
+                shift_duration = float(shift[4])
 
-            while not shift_assigned and len(attempted_employees) < len(emp_open) - 1:
-                index = employee_queue.popleft()  # Get the next employee in the queue
-                attempted_employees.add(index)
-                employee = emp_open[index]
-                employee_name = employee[0]
+                shift_assigned = False
+                attempted_employees = set()
 
-                if (employees[index][2] == '1' and shift_file == "laser_shifts.csv") or \
-                   (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
-                    if is_employee_available(service, employees[index], shift_start, shift_end) and \
-                       employee[2] >= shift_duration:
-                        employee[1] += shift_duration  # Add to work_hours
-                        employee[2] -= shift_duration  # Subtract from remaining_hours
+                while not shift_assigned and len(attempted_employees) < len(emp_open) - 1:
+                    index = employee_queue.popleft()  # Get the next employee in the queue
+                    attempted_employees.add(index)
+                    employee = emp_open[index]
+                    employee_name = employee[0]
 
-                        shift[-1] = employee_name  # Assign employee name to shift
-                        assigned_shifts += 1
+                    if (employees[index][2] == '1' and shift_file == "laser_shifts.csv") or \
+                       (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
+                        if is_employee_available(service, employees[index], shift_start, shift_end) and \
+                           employee[2] >= shift_duration:
+                            employee[1] += shift_duration  # Add to work_hours
+                            employee[2] -= shift_duration  # Subtract from remaining_hours
 
-                        print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee_name}")
-                        shift_assigned = True
+                            shift[-1] = employee_name  # Assign employee name to shift
+                            assigned_shifts += 1
 
-                employee_queue.append(index)  # Re-add the employee to the end of the queue
+                            print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee_name}")
+                            shift_assigned = True
 
-                # If all employees have been attempted and shift is not assigned, mark shift as "OFFEN" and break
-                if len(attempted_employees) == len(emp_open) - 1 and not shift_assigned:
-                    shift[-1] = "OFFEN"
-                    break
+                    employee_queue.append(index)  # Re-add the employee to the end of the queue
+
+                    # If all employees have been attempted and shift is not assigned, mark shift as "OFFEN" and break
+                    if len(attempted_employees) == len(emp_open) - 1 and not shift_assigned:
+                        shift[-1] = "OFFEN"
+                        break
 
     print(f"Total shifts processed: {assigned_shifts}/{total_shifts}")
+
+    return shifts
+
 
 
 
@@ -209,15 +217,14 @@ def main():
     # Fetch and write employee events
     fetch_and_write_employee_events(service, employees, shift_month, shift_year)
 
-    # Assign shifts
-    assign_shifts(shifts, emp_open, service, employees)
+    # Assign shifts and get processed shifts
+    processed_shifts = assign_shifts(shifts, emp_open, service, employees)
 
     # Write updated data back to CSV files
     for shift_file in SHIFT_FILES:
         month_name = calendar.month_name[shift_month].lower()
-        output_file = os.path.join(
-            OUTPUT_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
-        write_csv(output_file, shifts[shift_file])
+        output_file = os.path.join(OUTPUT_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
+        write_csv(output_file, processed_shifts[shift_file])
 
     # Prepare and write employee output using emp_open data structure
     write_csv(os.path.join(OUTPUT_DIR, "emp_output.csv"), emp_open)
