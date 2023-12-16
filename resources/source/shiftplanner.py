@@ -77,6 +77,16 @@ def fetch_and_write_employee_events(service, employees, month, year):
 
                 writer.writerow([day, weekday, start_time, end_time, duration, event_name])
 
+def prepare_employee_data(employees):
+    emp_open = [['Name', 'work_hours', 'remaining_hours']]
+    for emp in employees[1:]:
+        try:
+            remaining_hours = float(emp[4])  # Convert to float as it will be used for calculations
+        except ValueError:
+            continue  # Skip if conversion fails
+        emp_open.append([emp[0], 0.00, remaining_hours])  # Initialize work_hours with 0.00
+    return emp_open
+
 # Function to check employee availability
 def is_employee_available(service, employee, shift_start, shift_end):
     if shift_start.tzinfo is None or shift_start.tzinfo.utcoffset(shift_start) is None:
@@ -110,40 +120,42 @@ def is_employee_available(service, employee, shift_start, shift_end):
 
     return True
 
-def assign_shifts(shifts, employees, service):
+def assign_shifts(shifts, emp_open, service, employees):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
     assigned_shifts = 0
 
     for shift_file in SHIFT_FILES:
         for shift in shifts[shift_file][1:]:  # Skip header row
-            shift_date_str, _, shift_start_str, shift_end_str, _ = shift[:5]
+            shift_date_str, _, shift_start_str, shift_end_str, shift_name = shift[:5]
             shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
+            weekday = shift_date.strftime('%A')  # Get weekday from the date
             shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
             shift_end = shift_date + timedelta(hours=int(shift_end_str.split(":")[0]), minutes=int(shift_end_str.split(":")[1]))
             shift_duration = float(shift[4])
 
             shift_assigned = False
-            for index, employee in enumerate(employees[1:], start=1):  # Start index from 1 to adjust for header
-                if (employee[2] == '1' and shift_file == "laser_shifts.csv") or (employee[3] == '1' and shift_file == "holo_shifts.csv"):
-                    if is_employee_available(service, employee, shift_start, shift_end):
-                        shift[-1] = employee[0]
+            for index, employee in enumerate(emp_open[1:], start=1):  # Adjusted for emp_open structure
+                if (employees[index][2] == '1' and shift_file == "laser_shifts.csv") or \
+                    (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
+                    if is_employee_available(service, employees[index], shift_start, shift_end):
+                        if employee[2] >= shift_duration:  # Check if remaining hours are enough
+                            employee[1] += shift_duration  # Add to work_hours
+                            employee[2] -= shift_duration  # Subtract from remaining_hours
 
-                        # Update hours in emp_output
-                        work_hours = float(employee[6]) + shift_duration
-                        remaining_hours = float(employee[7]) - shift_duration
+                            shift[-1] = employee[0]  # Assign employee name to shift
+                            assigned_shifts += 1
+                            shift_assigned = True
+                            
+                            # Print progress for each assigned shift
+                            print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee[0]}")
 
-                        # Update the employee data in emp_output
-                        employees[index][6] = str(work_hours)
-                        employees[index][7] = str(remaining_hours)
-
-                        assigned_shifts += 1
-                        shift_assigned = True
-                        break
+                            break
 
             if not shift_assigned:
                 shift[-1] = "OFFEN"
 
     print(f"Total shifts processed: {assigned_shifts}/{total_shifts}")
+
 
 # Function to write data to CSV
 def write_csv(file_path, data):
@@ -151,7 +163,9 @@ def write_csv(file_path, data):
         writer = csv.writer(file)
         writer.writerows(data)
 
-# Main Program
+
+## Main Program
+
 def main():
     # Read shifts and employee data
     shifts = {file: read_csv(os.path.join(TMP_DIR, file)) for file in SHIFT_FILES}
@@ -163,15 +177,7 @@ def main():
     shift_year = first_shift_date.year
 
     employees = read_csv(EMPLOYEES_FILE)
-
-    # Initialize emp_output with additional columns
-    emp_output = [employees[0] + ['work_hours', 'remaining_hours']]
-    for emp in employees[1:]:
-        try:
-            max_hours = float(emp[4])
-        except ValueError:
-            continue
-        emp_output.append(emp + [0, max_hours])
+    emp_open = prepare_employee_data(employees)  # Create emp_open data structure
 
     # Connect to Google Calendar
     service = google_calendar_service()
@@ -180,7 +186,7 @@ def main():
     fetch_and_write_employee_events(service, employees, shift_month, shift_year)
 
     # Assign shifts
-    assign_shifts(shifts, emp_output, service)
+    assign_shifts(shifts, emp_open, service, employees)
 
     # Write updated data back to CSV files
     for shift_file in SHIFT_FILES:
@@ -189,8 +195,9 @@ def main():
             TMP_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
         write_csv(output_file, shifts[shift_file])
 
-    # Prepare and write employee output
-    write_csv(os.path.join(TMP_DIR, "emp_output.csv"), emp_output)
+    # Prepare and write employee output using emp_open data structure
+    write_csv(os.path.join(TMP_DIR, "emp_output.csv"), emp_open)
 
 if __name__ == "__main__":
     main()
+
