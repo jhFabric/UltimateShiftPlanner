@@ -6,6 +6,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 from dateutil import parser
+from collections import deque
 
 # Constants and configurations
 ScriptPath = os.path.abspath(__file__)
@@ -117,6 +118,10 @@ def is_employee_available(service, employee, shift_start, shift_end):
 
     events = events_result.get('items', [])
 
+    # If there are no events in the calendar for the shift period, return False (not available)
+    if not events:
+        return False
+
     for event in events:
         event_start_str = event['start'].get('dateTime', event['start'].get('date'))
         event_end_str = event['end'].get('dateTime', event['end'].get('date'))
@@ -125,45 +130,55 @@ def is_employee_available(service, employee, shift_start, shift_end):
 
         if "block" in event.get('summary', '').lower():
             if event_start < shift_end and event_end > shift_start:
-                return False
+                return False  # There is an overlap with an existing event
 
-    return True
+    return True  # No overlaps found, the employee is available
 
 def assign_shifts(shifts, emp_open, service, employees):
     total_shifts = sum(len(shifts[file]) - 1 for file in SHIFT_FILES)
     assigned_shifts = 0
-    for shift_file in SHIFT_FILES:
+    employee_queue = deque(range(1, len(emp_open)))  # Queue of employee indices, starting from 1 to skip header
 
+    for shift_file in SHIFT_FILES:
         for shift in shifts[shift_file][1:]:  # Skip header row
             shift_date_str, _, shift_start_str, shift_end_str, _, shift_name = shift[:6]
             shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
-            weekday = shift_date.strftime('%A')  # Get weekday from the date
+            weekday = shift_date.strftime('%A')
             shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
             shift_end = shift_date + timedelta(hours=int(shift_end_str.split(":")[0]), minutes=int(shift_end_str.split(":")[1]))
             shift_duration = float(shift[4])
 
             shift_assigned = False
-            for index, employee in enumerate(emp_open[1:], start=1):  # Adjusted for emp_open structure
+            attempted_employees = set()
+
+            while not shift_assigned and len(attempted_employees) < len(emp_open) - 1:
+                index = employee_queue.popleft()  # Get the next employee in the queue
+                attempted_employees.add(index)
+                employee = emp_open[index]
+                employee_name = employee[0]
+
                 if (employees[index][2] == '1' and shift_file == "laser_shifts.csv") or \
-                    (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
-                    if is_employee_available(service, employees[index], shift_start, shift_end):
-                        if employee[2] >= shift_duration:  # Check if remaining hours are enough
-                            employee[1] += shift_duration  # Add to work_hours
-                            employee[2] -= shift_duration  # Subtract from remaining_hours
+                   (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
+                    if is_employee_available(service, employees[index], shift_start, shift_end) and \
+                       employee[2] >= shift_duration:
+                        employee[1] += shift_duration  # Add to work_hours
+                        employee[2] -= shift_duration  # Subtract from remaining_hours
 
-                            shift[-1] = employee[0]  # Assign employee name to shift
-                            assigned_shifts += 1
-                            shift_assigned = True
-                            
-                            # Print progress for each assigned shift
-                            print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee[0]}")
+                        shift[-1] = employee_name  # Assign employee name to shift
+                        assigned_shifts += 1
 
-                            break
+                        print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee_name}")
+                        shift_assigned = True
 
-            if not shift_assigned:
-                shift[-1] = "OFFEN"
+                employee_queue.append(index)  # Re-add the employee to the end of the queue
+
+                # If all employees have been attempted and shift is not assigned, mark shift as "OFFEN" and break
+                if len(attempted_employees) == len(emp_open) - 1 and not shift_assigned:
+                    shift[-1] = "OFFEN"
+                    break
 
     print(f"Total shifts processed: {assigned_shifts}/{total_shifts}")
+
 
 
 # Function to write data to CSV
@@ -171,7 +186,6 @@ def write_csv(file_path, data):
     with open(file_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerows(data)
-
 
 ## Main Program
 
