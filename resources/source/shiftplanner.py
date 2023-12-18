@@ -82,7 +82,7 @@ def fetch_and_write_employee_events(service, employees, month, year):
 def prepare_employee_data(employees):
     emp_open = [['Name', 'work_hours', 'remaining_hours']]
     for emp in employees[1:]:
-        print("Debug - Employee data:", emp)  # Debug print
+        # print("Debug - Employee data:", emp)
 
         try:
             remaining_hours = float(emp[4])  # Convert to float as it will be used for calculations
@@ -139,28 +139,34 @@ def assign_shifts(shifts, emp_open, service, employees):
     assigned_shifts = 0
     employee_queue = deque(range(1, len(emp_open)))  # Queue of employee indices, starting from 1 to skip header
 
-    # Create a copy of the shifts for processing
+    # Tracking the last assigned employee for each store
+    last_assigned_employee = {shift_file: None for shift_file in SHIFT_FILES}
+
     shifts_copy = {file: list(shifts[file]) for file in SHIFT_FILES}
 
     while any(len(shifts_copy[file]) > 1 for file in SHIFT_FILES):
         for shift_file in SHIFT_FILES:
-            if len(shifts_copy[shift_file]) > 1:  # Check if there are shifts left in the file
-                shift = shifts_copy[shift_file].pop(1)  # Process the first shift from the copy
+            if len(shifts_copy[shift_file]) > 1:
+                shift = shifts_copy[shift_file].pop(1)
                 shift_date_str, _, shift_start_str, shift_end_str, _, shift_name = shift[:6]
                 shift_date = datetime.strptime(shift_date_str, "%Y-%m-%d")
-                weekday = shift_date.strftime('%A')
                 shift_start = shift_date + timedelta(hours=int(shift_start_str.split(":")[0]), minutes=int(shift_start_str.split(":")[1]))
                 shift_end = shift_date + timedelta(hours=int(shift_end_str.split(":")[0]), minutes=int(shift_end_str.split(":")[1]))
-                shift_duration = float(shift[4])
+                shift_duration = (shift_end - shift_start).total_seconds() / 3600
 
                 shift_assigned = False
                 attempted_employees = set()
 
                 while not shift_assigned and len(attempted_employees) < len(emp_open) - 1:
-                    index = employee_queue.popleft()  # Get the next employee in the queue
+                    index = employee_queue.popleft()
                     attempted_employees.add(index)
                     employee = emp_open[index]
                     employee_name = employee[0]
+
+                    # Check if the current employee was the last to be assigned a shift in this store
+                    if employee_name == last_assigned_employee[shift_file]:
+                        employee_queue.append(index)  # Requeue the employee and continue to the next
+                        continue
 
                     if (employees[index][2] == '1' and shift_file == "laser_shifts.csv") or \
                        (employees[index][3] == '1' and shift_file == "holo_shifts.csv"):
@@ -168,24 +174,22 @@ def assign_shifts(shifts, emp_open, service, employees):
                            employee[2] >= shift_duration:
                             employee[1] += shift_duration  # Add to work_hours
                             employee[2] -= shift_duration  # Subtract from remaining_hours
-
-                            shift[-1] = employee_name  # Assign employee name to shift
+                            shift[-1] = employee_name
+                            last_assigned_employee[shift_file] = employee_name  # Update last assigned employee for this store
                             assigned_shifts += 1
-
-                            print(f"{weekday}, {shift_date_str}, {shift_name} assigned to {employee_name}")
+                            print(f"{shift_date_str}, {shift_name} assigned to {employee_name}")
                             shift_assigned = True
 
-                    employee_queue.append(index)  # Re-add the employee to the end of the queue
+                    employee_queue.append(index)
 
-                    # If all employees have been attempted and shift is not assigned, mark shift as "OFFEN" and break
-                    if len(attempted_employees) == len(emp_open) - 1 and not shift_assigned:
-                        shift[-1] = "OFFEN"
-                        break
+                if not shift_assigned:
+                    shift[-1] = "OFFEN"
+
+                if not employee_queue:
+                    employee_queue = deque(range(1, len(emp_open)))
 
     print(f"Total shifts processed: {assigned_shifts}/{total_shifts}")
-
     return shifts
-
 
 
 
@@ -231,4 +235,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

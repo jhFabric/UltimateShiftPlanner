@@ -1,6 +1,8 @@
 import os
 import sys
 import subprocess
+from resources.source import shiftplanner, Retrieve_Shifts, employees
+
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
