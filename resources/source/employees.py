@@ -4,10 +4,16 @@ import sys
 
 ## 01.12.2023 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
 # Set Base directory # Initialize CSV file
 ScriptPath = os.path.abspath(__file__)
 HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
-csvPath = os.path.join(HomeDir, 'resources', 'data', 'employees.csv')
+csvPath = resource_path(os.path.join('..', 'data', 'employees.csv'))
 print("CSV Path:", csvPath)
 
 ## Functions
@@ -104,7 +110,7 @@ def main():
     headers = employees.pop(0) if employees else ['name', 'cal-id', 'laser', 'holo', 'max_hours']
 
     while True:
-        action = get_valid_input("Do you want to add, modify or delete an employee from the list? (a) Add; (b) modify; (c) delete; (x) exit: ", ['a', 'b', 'c'])
+        action = get_valid_input("\n\nDo you want to add, modify or delete an employee from the list? (a) Add; (b) modify; (c) delete; (x) exit: ", ['a', 'b', 'c'])
         if action == 'a':
             employees.append(add_employee())
         elif action == 'b':

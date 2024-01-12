@@ -1,0 +1,63 @@
+So I need another script for my python program. 
+It is part of a greater modular tool that retrieves information about shifts and availabilities for my company and its employees and exports the intermediate data in CSV files. 
+First of all the file and folder structure is very important. 
+For the sake of creating an .exe file with pyinstaller later on I do work with a relative_paths function. 
+'''
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+'''
+The file-structure of the program is: 
+
+'''
+Main Directory = .../UltimateShiftPlanner/
+
+.../UltimateShiftPlanner/
+UltimateShiftPlanner.py #Welcome Script that calls the other ones. 
+readme.md
+
+.../UltimateShiftPanner/output
+# here the formattet output files shall be stored
+
+.../UltimateShiftPlanner/tmp
+# in this dir there are many .csv files that should be taken into account for the script we want to create. 
+holo_shifts.csv
+laser_shifts.csv
+jonas_events.csv
+...
+
+.../UltimateShiftPlanner/resources/
+
+.../UltimateShiftPlanner/resources/source
+
+# here all the scripts called in the Welcome Script are located
+shiftplanner.py
+Retrieve_Shifts.py
+employees.py
+formatter.py
+upload_events.py # the script we are about to create
+
+.../UltimateShiftPlanner/resources/keys
+# Here is the auth-json for the Google Calendar located
+
+.../UltimateShiftPlanner/resources/data
+employees.csv
+# some more files not relevant for the new script
+
+.../UltimateShiftPlanner/resources/logo
+logo.ico
+
+'''
+
+Now the new script should read four .csv files and store the data. 
+Firstly in the folder ".../UltimateShiftPlanner/tmp" there are 'laser_shift.csv' and 'holo_shift.csv'. Secondly in the folder ".../UltimateShiftPlanner/input" there are 'laser_{name_of_the_month}.csv' and 'holo_{name_of_the_month}.csv'. {name_of_the_month} does usually conern the current month. To be precise we firstly may analyze "holo_shifts.csv" and "laser_shifts.csv" where the first index (index 0) from the second line onwards contains a date.
+
+For simplicity I will not refer to the .csv files as a datastructure with index(0 - n) but as tables with rows (1 - n) and columns (1 - n). Please notice that in any csv file the first line contains the titles for the columns only. 
+
+Now the files are both structured almost identically. 
+The titles in both cases/ all four files are ''' day (YYYY-MM-DD), weekday (e.g. monday), start (start-time of the shift), end (end time of the shift), shift (name of the shift) '''. The last column (shift) is different though. For "holo_shifts.csv" and "laser_shifts.csv" it contains the name of the initial shift. For 'laser_{name_of_the_month}.csv' and 'holo_{name_of_the_month}.csv' it stores the name of the employee that is assigned to that shift. 
+
+Now the script should connect to two google calendars with the IDs : "Holo_Calendar: mcisnbiilvaj5481i9cnloga40@group.calendar.google.com " and "Laser_Calendar: mcisnbiilvaj5481i9cnloga40@group.calendar.google.com "o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com". 
+My Oauth Json file is stored in   ".../UltimateShiftPlanner/resources/keys" and is named:" ultimate-shift-planning-a1f509220989.json "
+

@@ -1,3 +1,4 @@
+import sys
 import os
 import re
 import csv
@@ -7,13 +8,19 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
 ## Directories & Network
 
 # Set Base directory # Call Credentials JSON
 ScriptPath = os.path.abspath(__file__)
 HomeDir = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
-Key = os.path.join(HomeDir, 'resources', 'keys',
-                       'ultimate-shift-planning-a1f509220989.json')
+Key = resource_path(os.path.join('..', 'keys', 'ultimate-shift-planning-a1f509220989.json'))
+
 
 ## Retrieve Data from Mitarbeiter Kalender in Google
 
@@ -59,7 +66,7 @@ def calculate_duration(start_time, end_time):
 
 
 # Function to parse and proceed the calendar # Creates CSV
-def process_calendar(calendar_id, event_names, csv_filename):
+def process_calendar(calendar_id, event_names, csv_filename, start_of_month_utc, end_of_month_utc):
     events_result = service.events().list(
         calendarId=calendar_id,
         timeMin=start_of_month_utc,
@@ -87,7 +94,9 @@ def process_calendar(calendar_id, event_names, csv_filename):
 
     # Sort and write to CSV
     sorted_events = sorted(formatted_events, key=lambda x: (x['day'], x['start']))
-    csv_output_file_path = os.path.join(HomeDir, 'tmp', csv_filename)
+    csv_output_file_path = resource_path(os.path.join('..', '..', 'tmp', csv_filename))
+
+
     
     with open(csv_output_file_path, mode='w', newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=['day', 'weekday', 'start', 'end', 'time', 'shift'])
@@ -99,25 +108,35 @@ def process_calendar(calendar_id, event_names, csv_filename):
 
 ## User Input
 
-while True:
-    month = input("Enter the month (e.g., '2023-11'): ")
-    if re.match(r'\d{4}-\d{2}', month) and len(month) == 7:
-        break
-    print('Please repeat in the format jjjj-mm e.g. "2023-11"')
+def main():
+    # Key path adjustment
+    Key = resource_path(os.path.join('..', 'keys', 'ultimate-shift-planning-a1f509220989.json'))
 
-# Last day of the month
-year, month_num = map(int, month.split('-'))
-last_day = calendar.monthrange(year, month_num)[1]
+    # Google Calendar API setup
+    credentials = service_account.Credentials.from_service_account_file(
+        Key, scopes=['https://www.googleapis.com/auth/calendar.readonly'])
+    service = build('calendar', 'v3', credentials=credentials)
 
-# Start & end of month in UTC
-start_of_month_utc = f'{month}-01T00:00:00Z'
-end_of_month_utc = f'{month}-{last_day}T23:59:59Z'
+    # User Input for month
+    while True:
+        month = input("Enter the month (e.g., '2023-11'): ")
+        if re.match(r'\d{4}-\d{2}', month) and len(month) == 7:
+            break
+        print('Please repeat in the format jjjj-mm e.g. "2023-11"')
 
-# Function call
-process_calendar(CALENDAR_LASER_ID, ['Halle 1', 'Halle 2'], 'laser_shifts.csv')
-process_calendar(CALENDAR_HOLO_ID, ['Cafe 1', 'Cafe 2'], 'holo_shifts.csv')
+    # Calculate start and end of the month in UTC
+    year, month_num = map(int, month.split('-'))
+    last_day = calendar.monthrange(year, month_num)[1]
+    start_of_month_utc = f'{month}-01T00:00:00Z'
+    end_of_month_utc = f'{month}-{last_day}T23:59:59Z'
 
-# OutputPath
-csv_output_file_path = os.path.join(HomeDir, 'tmp', 'laser_shifts.csv')
+    # Call process_calendar with the additional arguments
+    process_calendar(CALENDAR_LASER_ID, ['Halle 1', 'Halle 2'], 'laser_shifts.csv', start_of_month_utc, end_of_month_utc)
+    process_calendar(CALENDAR_HOLO_ID, ['Cafe 1', 'Cafe 2'], 'holo_shifts.csv', start_of_month_utc, end_of_month_utc)
 
-print(f'Events retrieved and saved to {csv_output_file_path}')
+    # OutputPath
+    csv_output_file_path = resource_path(os.path.join('..', '..', 'tmp', 'laser_shifts.csv'))
+    print(f'Events retrieved and saved to {csv_output_file_path}')
+
+if __name__ == "__main__":
+    main()

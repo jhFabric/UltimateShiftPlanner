@@ -23,7 +23,8 @@ def main():
         print("Choose a function:")
         print("1) Schichten für Monat ziehen")
         print("2) Schichten für aktuell gewählten Monat erstellen")
-        print("3) Mitarbeiter ändern")
+        print("3) Tabelle \"Freie Mitarbeiter\" erstellen")
+        print("4) Mitarbeiter ändern")
         print("x) UltimateShiftPlanner beenden\n")
 
         choice = input("Enter your choice: ").lower()
@@ -33,6 +34,8 @@ def main():
         elif choice in ['2', 'two', 'zwei', 'b']:
             run_script('shiftplanner.py')
         elif choice in ['3', 'three', 'drei', 'c']:
+            run_script('formatter.py')
+        elif choice in ['4', 'four', 'vier', 'd']:
             run_script('employees.py')
         elif choice in ['q', 'x', 'exit', 'quit', 'schließen', 'ende']:
             print("Exiting UltimateShiftPlanner.")

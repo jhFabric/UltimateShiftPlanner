@@ -1,3 +1,4 @@
+import sys
 import os
 import csv
 import pytz
@@ -8,19 +9,24 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from collections import deque
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
 # Constants and configurations
 ScriptPath = os.path.abspath(__file__)
-HOME_DIR = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
-RESOURCES_DIR = os.path.join(HOME_DIR, "resources")
-KEYS_DIR = os.path.join(RESOURCES_DIR, "keys")
-DATA_DIR = os.path.join(RESOURCES_DIR, "data")
-TMP_DIR = os.path.join(HOME_DIR, "tmp")
-OUTPUT_DIR = os.path.join(HOME_DIR, "output")
+# HOME_DIR = os.path.dirname(os.path.dirname(os.path.dirname(ScriptPath)))
+# RESOURCES_DIR = os.path.join(HOME_DIR, "resources")
+# KEYS_DIR = os.path.join(RESOURCES_DIR, "keys")
+# DATA_DIR = os.path.join(RESOURCES_DIR, "data")
+# TMP_DIR = os.path.join(HOME_DIR, "tmp")
+# OUTPUT_DIR = os.path.join(HOME_DIR, "output")
 SHIFT_FILES = ["laser_shifts.csv", "holo_shifts.csv"]
-EMPLOYEES_FILE = os.path.join(DATA_DIR, "employees.csv")
+EMPLOYEES_FILE = resource_path(os.path.join('..', 'data', 'employees.csv'))
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-SERVICE_ACCOUNT_FILE = os.path.join(
-    KEYS_DIR, 'ultimate-shift-planning-a1f509220989.json')
+SERVICE_ACCOUNT_FILE = resource_path(os.path.join('..', 'keys', 'ultimate-shift-planning-a1f509220989.json'))
 
 # Function to read CSV file and return data as a list of lists
 def read_csv(file_path):
@@ -49,7 +55,9 @@ def fetch_and_write_employee_events(service, employees, month, year):
     for employee in employees[1:]:  # Skip header
         calendar_id = employee[1].strip()
         employee_name = employee[0].strip()
-        output_file_path = os.path.join(TMP_DIR, f"{employee_name}_events.csv")
+        output_file_path = resource_path(os.path.join('..', '..', 'tmp', f"{employee_name}_events.csv"))
+
+
 
         events_result = service.events().list(
             calendarId=calendar_id,
@@ -203,7 +211,9 @@ def write_csv(file_path, data):
 
 def main():
     # Read shifts and employee data
-    shifts = {file: read_csv(os.path.join(TMP_DIR, file)) for file in SHIFT_FILES}
+    shifts = {file: read_csv(resource_path(os.path.join('..', '..', 'tmp', file))) for file in SHIFT_FILES}
+
+
     # print("Debug - Shifts dictionary content:", shifts)
 
     # Extract month and year from the first data row of either shift file
@@ -227,11 +237,14 @@ def main():
     # Write updated data back to CSV files
     for shift_file in SHIFT_FILES:
         month_name = calendar.month_name[shift_month].lower()
-        output_file = os.path.join(OUTPUT_DIR, f"{shift_file.split('_')[0]}_{month_name}.csv")
+        output_file = resource_path(os.path.join('..', '..', 'output', f"{shift_file.split('_')[0]}_{month_name}.csv"))
         write_csv(output_file, processed_shifts[shift_file])
 
+
     # Prepare and write employee output using emp_open data structure
-    write_csv(os.path.join(OUTPUT_DIR, "emp_output.csv"), emp_open)
+    emp_output_file = resource_path(os.path.join('..', '..', 'output', "emp_output.csv"))
+    write_csv(emp_output_file, emp_open)
+
 
 if __name__ == "__main__":
     main()
