@@ -39,7 +39,7 @@ def main():
         elif choice in ['4', 'four', 'vier', 'd']:
             run_script('employees.py')
         elif choice in ['5', 'five', 'fünf', 'd']:
-            print ("To be continued")
+            run_script('hour_evaluation.py')
         elif choice in ['q', 'x', 'exit', 'quit', 'schließen', 'ende']:
             print("Exiting UltimateShiftPlanner.")
             break
