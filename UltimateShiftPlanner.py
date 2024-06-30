@@ -25,6 +25,7 @@ def main():
         print("2) Schichten für aktuell gewählten Monat erstellen")
         print("3) Tabelle \"Freie Mitarbeiter\" erstellen")
         print("4) Mitarbeiter ändern")
+        print("5) Auswertung gearbeitete Stunden")
         print("x) UltimateShiftPlanner beenden\n")
 
         choice = input("Enter your choice: ").lower()
@@ -37,6 +38,8 @@ def main():
             run_script('formatter.py')
         elif choice in ['4', 'four', 'vier', 'd']:
             run_script('employees.py')
+        elif choice in ['5', 'five', 'fünf', 'd']:
+            print ("To be continued")
         elif choice in ['q', 'x', 'exit', 'quit', 'schließen', 'ende']:
             print("Exiting UltimateShiftPlanner.")
             break
