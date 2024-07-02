@@ -6,9 +6,12 @@ from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
+
 def resource_path(relative_path):
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(
+        os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
+
 
 def read_employee_names(csv_file_path):
     employee_names = []
@@ -19,16 +22,20 @@ def read_employee_names(csv_file_path):
             employee_names.append(row[0])
     return employee_names
 
+
 def google_calendar_service():
-    key_path = resource_path(os.path.join('..', 'keys', 'ultimate-shift-planning-a1f509220989.json'))
+    key_path = resource_path(os.path.join(
+        '..', 'keys', 'ultimate-shift-planning-a1f509220989.json'))
     credentials = service_account.Credentials.from_service_account_file(
         key_path, scopes=['https://www.googleapis.com/auth/calendar.readonly'])
     service = build('calendar', 'v3', credentials=credentials)
     return service
 
+
 def format_event_date(date_str):
     dt = datetime.fromisoformat(date_str)
     return dt.strftime('%d.%m.%Y;%H:%M')
+
 
 def get_calendar_events(service, calendar_id, start_of_month, end_of_month):
     events_result = service.events().list(
@@ -39,36 +46,69 @@ def get_calendar_events(service, calendar_id, start_of_month, end_of_month):
         orderBy='startTime'
     ).execute()
     return [
-        (
-            f"{format_event_date(event['start']['dateTime']).split(';')[0]};{format_event_date(event['start']['dateTime']).split(';')[1]};"
-            f"{format_event_date(event['end']['dateTime']).split(';')[1]};{event.get('summary', 'No Title')}",
-            calendar_id
-        )
+        {
+            'start_date': format_event_date(event['start']['dateTime']).split(';')[0],
+            'start_time': format_event_date(event['start']['dateTime']).split(';')[1],
+            'end_time': format_event_date(event['end']['dateTime']).split(';')[1],
+            'title': event.get('summary', 'No Title'),
+            'calendar_id': calendar_id
+        }
         for event in events_result.get('items', []) if 'dateTime' in event['start']
     ]
 
-def initialize_employee_events(employee_names):
-    return {name: [["" for _ in range(6)] for _ in range(31)] for name in employee_names}
 
-def assign_events_to_employees(employee_names, all_events):
-    employee_events = initialize_employee_events(employee_names)
-    for event_detail, cal_id in all_events:
-        date, start_time, end_time, title = event_detail.split(';')
-        day_index = int(date.split('.')[0]) - 1
-        for name in employee_names:
-            if name in title:
-                slot_index = 4 if 'krank' in title.lower() else 0 if cal_id == 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com' else 2
-                employee_events[name][day_index][slot_index:slot_index+2] = [start_time, end_time]
-    return employee_events
+def initialize_employee_events(employee_names):
+    return {name: [["" for _ in range(12)] for _ in range(31)] for name in employee_names}
+
+
+def assign_events_to_employees(employee_names, events):
+    employee_data = {name: [["" for _ in range(12)] for _ in range(31)] for name in employee_names}
+
+    for event in events:
+        title = event['title'].lower()
+        start_date = event['start_date']
+        start_time = event['start_time']
+        end_time = event['end_time']
+        calendar_id = event['calendar_id']
+        
+        # Find employee name from the title if it's in the list
+        employee_name = next((name for name in employee_names if name.lower() in title), None)
+        
+        if employee_name:
+            day = int(start_date.split('.')[0]) - 1  # Convert day to 0-based index
+            if calendar_id == 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com':
+                if 'krank' not in title and 'pause' not in title:
+                    employee_data[employee_name][day][0] = start_time
+                    employee_data[employee_name][day][1] = end_time
+                elif 'krank' in title:
+                    employee_data[employee_name][day][4] = start_time
+                    employee_data[employee_name][day][5] = end_time
+                elif 'pause' in title:
+                    employee_data[employee_name][day][8] = start_time
+                    employee_data[employee_name][day][9] = end_time
+            elif calendar_id == 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com':
+                if 'krank' not in title and 'pause' not in title:
+                    employee_data[employee_name][day][2] = start_time
+                    employee_data[employee_name][day][3] = end_time
+                elif 'krank' in title:
+                    employee_data[employee_name][day][6] = start_time
+                    employee_data[employee_name][day][7] = end_time
+                elif 'pause' in title:
+                    employee_data[employee_name][day][10] = start_time
+                    employee_data[employee_name][day][11] = end_time
+
+    return employee_data
+
 
 def save_employee_events(output_path, month_input, employee_events):
     month_dir = os.path.join(output_path, month_input)
-    os.makedirs(month_dir, exist_ok=True)  # Create the month directory if it doesn't exist
+    os.makedirs(month_dir, exist_ok=True)
     for name, days in employee_events.items():
         file_path = os.path.join(month_dir, f"{name}_{month_input}.txt")
         with open(file_path, 'w') as file:
             for day in days:
                 file.write('\t'.join(day) + '\n')
+
 
 def main():
     employees_file = resource_path(os.path.join('..', 'data', 'employees.csv'))
@@ -96,6 +136,7 @@ def main():
     save_employee_events(output_path, f"{year}-{month:02d}", employee_events)
 
     print('Auswertung erfolgreich. Dateien unter /output/.')
+
 
 if __name__ == "__main__":
     main()
