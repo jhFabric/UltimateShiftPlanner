@@ -1,32 +1,31 @@
 day,weekday,start,end,time,shift
-2024-08-01,Thursday,14:00:00,22:30:00,8.5,Patrick
-2024-08-02,Friday,14:45:00,20:00:00,5.25,Patrick
-2024-08-03,Saturday,13:30:00,20:00:00,6.5,Patrick
-2024-08-04,Sunday,09:00:00,21:00:00,12.0,Patrick
-2024-08-05,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
-2024-08-06,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
-2024-08-07,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
-2024-08-08,Thursday,14:00:00,22:30:00,8.5,Patrick
-2024-08-09,Friday,14:45:00,20:00:00,5.25,Patrick
-2024-08-10,Saturday,13:30:00,20:00:00,6.5,Patrick
-2024-08-11,Sunday,09:00:00,21:00:00,12.0,Patrick
-2024-08-12,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
-2024-08-13,Tuesday,16:30:00,22:00:00,5.5,Patrick
-2024-08-14,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
-2024-08-15,Thursday,14:00:00,22:30:00,8.5,Patrick BLOCK
-2024-08-16,Friday,14:45:00,20:00:00,5.25,Patrick BLOCK
-2024-08-17,Saturday,13:30:00,20:00:00,6.5,Patrick BLOCK
-2024-08-18,Sunday,09:00:00,21:00:00,12.0,Patrick BLOCK
-2024-08-19,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
-2024-08-20,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
-2024-08-21,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
-2024-08-22,Thursday,14:00:00,22:30:00,8.5,Patrick
-2024-08-23,Friday,14:45:00,20:00:00,5.25,Patrick
-2024-08-24,Saturday,13:30:00,20:00:00,6.5,Patrick
-2024-08-25,Sunday,09:00:00,21:00:00,12.0,Patrick
-2024-08-26,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
-2024-08-27,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
-2024-08-28,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
-2024-08-29,Thursday,14:00:00,22:30:00,8.5,Patrick
-2024-08-30,Friday,14:45:00,20:00:00,5.25,Patrick
-2024-08-31,Saturday,13:30:00,20:00:00,6.5,Patrick
+2024-09-01,Sunday,09:00:00,21:00:00,12.0,Patrick
+2024-09-02,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
+2024-09-03,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
+2024-09-04,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
+2024-09-05,Thursday,14:00:00,22:30:00,8.5,Patrick
+2024-09-06,Friday,14:45:00,20:00:00,5.25,Patrick
+2024-09-07,Saturday,13:30:00,20:00:00,6.5,Patrick
+2024-09-08,Sunday,09:00:00,21:00:00,12.0,Patrick
+2024-09-09,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
+2024-09-10,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
+2024-09-11,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
+2024-09-12,Thursday,14:00:00,22:30:00,8.5,Patrick
+2024-09-13,Friday,14:45:00,20:00:00,5.25,Patrick
+2024-09-14,Saturday,13:30:00,20:00:00,6.5,Patrick
+2024-09-15,Sunday,09:00:00,21:00:00,12.0,Patrick
+2024-09-16,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
+2024-09-17,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
+2024-09-18,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
+2024-09-19,Thursday,14:00:00,22:30:00,8.5,Patrick
+2024-09-20,Friday,14:45:00,20:00:00,5.25,Patrick BLOCK
+2024-09-21,Saturday,13:30:00,20:00:00,6.5,Patrick BLOCK
+2024-09-22,Sunday,09:00:00,21:00:00,12.0,Patrick
+2024-09-23,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK
+2024-09-24,Tuesday,16:30:00,22:00:00,5.5,Patrick BLOCK
+2024-09-25,Wednesday,15:15:00,22:00:00,6.75,Patrick BLOCK
+2024-09-26,Thursday,14:00:00,22:30:00,8.5,Patrick
+2024-09-27,Friday,14:45:00,20:00:00,5.25,Patrick BLOCK
+2024-09-28,Saturday,13:30:00,20:00:00,6.5,Patrick
+2024-09-29,Sunday,09:00:00,21:00:00,12.0,Patrick
+2024-09-30,Monday,16:15:00,22:00:00,5.75,Patrick BLOCK

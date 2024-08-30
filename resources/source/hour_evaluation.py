@@ -1,3 +1,10 @@
+'''
+Pausen rihtig ordnen
+Urlaub und Springer ordnen
+BLT   HC   KrankBLT   KrankHC   Urlaub   PauseBLT   PauseHC
+'''
+
+
 import os
 import csv
 import sys
@@ -62,7 +69,7 @@ def initialize_employee_events(employee_names):
 
 
 def assign_events_to_employees(employee_names, events):
-    employee_data = {name: [["" for _ in range(12)] for _ in range(31)] for name in employee_names}
+    employee_data = {name: [["" for _ in range(14)] for _ in range(31)] for name in employee_names}
 
     for event in events:
         title = event['title'].lower()
@@ -71,31 +78,61 @@ def assign_events_to_employees(employee_names, events):
         end_time = event['end_time']
         calendar_id = event['calendar_id']
         
+        # Skip events that contain 'springer' in the title for the HC calendar
+        if calendar_id == 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com' and 'springer' in title:
+            continue
+        
         # Find employee name from the title if it's in the list
         employee_name = next((name for name in employee_names if name.lower() in title), None)
         
         if employee_name:
             day = int(start_date.split('.')[0]) - 1  # Convert day to 0-based index
+            
             if calendar_id == 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com':
+                # BLT shifts
                 if 'krank' not in title and 'pause' not in title:
                     employee_data[employee_name][day][0] = start_time
                     employee_data[employee_name][day][1] = end_time
                 elif 'krank' in title:
-                    employee_data[employee_name][day][4] = start_time
-                    employee_data[employee_name][day][5] = end_time
-                elif 'pause' in title:
-                    employee_data[employee_name][day][8] = start_time
-                    employee_data[employee_name][day][9] = end_time
-            elif calendar_id == 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com':
-                if 'krank' not in title and 'pause' not in title:
                     employee_data[employee_name][day][2] = start_time
                     employee_data[employee_name][day][3] = end_time
-                elif 'krank' in title:
-                    employee_data[employee_name][day][6] = start_time
-                    employee_data[employee_name][day][7] = end_time
                 elif 'pause' in title:
-                    employee_data[employee_name][day][10] = start_time
-                    employee_data[employee_name][day][11] = end_time
+                    employee_data[employee_name][day][5] = start_time
+                    employee_data[employee_name][day][6] = end_time
+
+            elif calendar_id == 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com':
+                # HC shifts
+                if 'krank' not in title and 'pause' not in title:
+                    employee_data[employee_name][day][0] = start_time
+                    employee_data[employee_name][day][1] = end_time
+                elif 'krank' in title:
+                    employee_data[employee_name][day][2] = start_time
+                    employee_data[employee_name][day][3] = end_time
+                elif 'pause' in title:
+                    employee_data[employee_name][day][5] = start_time
+                    employee_data[employee_name][day][6] = end_time
+            
+            elif calendar_id == 'ss2jdk18vevkib95bhpmebacgc@group.calendar.google.com':
+                # Urlaub (Holiday) shifts
+                start_day = int(start_date.split('.')[0]) - 1  # 0-based index
+                end_day = int(event['end_time'].split('.')[0]) - 1  # 0-based index
+                duration = end_day - start_day + 1
+
+                if duration >= 7:
+                    employee_data[employee_name][start_day][4] = '00:00'
+                    employee_data[employee_name][start_day][7] = '05:00'
+                    employee_data[employee_name][start_day + 1][4] = '00:00'
+                    employee_data[employee_name][start_day + 1][7] = '05:00'
+                else:
+                    employee_data[employee_name][start_day][4] = '00:00'
+                    employee_data[employee_name][start_day][7] = '05:00'
+
+                # Add more shifts for longer holidays
+                for i in range(2, duration // 7 + 1):
+                    additional_day = start_day + (i - 1) * 7
+                    if additional_day < 31:
+                        employee_data[employee_name][additional_day][4] = '00:00'
+                        employee_data[employee_name][additional_day][7] = '05:00'
 
     return employee_data
 
