@@ -1,10 +1,3 @@
-'''
-Pausen rihtig ordnen
-Urlaub und Springer ordnen
-BLT   HC   KrankBLT   KrankHC   Urlaub   PauseBLT   PauseHC
-'''
-
-
 import os
 import csv
 import sys
@@ -39,9 +32,13 @@ def google_calendar_service():
     return service
 
 
-def format_event_date(date_str):
-    dt = datetime.fromisoformat(date_str)
-    return dt.strftime('%d.%m.%Y;%H:%M')
+def format_event_date(date_str, all_day=False):
+    if all_day:
+        dt = datetime.fromisoformat(date_str)
+        return dt.strftime('%d.%m.%Y')
+    else:
+        dt = datetime.fromisoformat(date_str)
+        return dt.strftime('%d.%m.%Y;%H:%M')
 
 
 def get_calendar_events(service, calendar_id, start_of_month, end_of_month):
@@ -52,20 +49,34 @@ def get_calendar_events(service, calendar_id, start_of_month, end_of_month):
         singleEvents=True,
         orderBy='startTime'
     ).execute()
-    return [
-        {
-            'start_date': format_event_date(event['start']['dateTime']).split(';')[0],
-            'start_time': format_event_date(event['start']['dateTime']).split(';')[1],
-            'end_time': format_event_date(event['end']['dateTime']).split(';')[1],
+    
+    events = []
+    for event in events_result.get('items', []):
+        if 'dateTime' in event['start']:
+            start_date = format_event_date(event['start']['dateTime'])
+            end_date = format_event_date(event['end']['dateTime'])
+            all_day = False
+        elif 'date' in event['start']:
+            start_date = format_event_date(event['start']['date'], all_day=True)
+            end_date = format_event_date(event['end']['date'], all_day=True)
+            all_day = True
+        else:
+            continue
+
+        events.append({
+            'start_date': start_date.split(';')[0],
+            'start_time': start_date.split(';')[1] if not all_day else '00:00',
+            'end_date': end_date.split(';')[0],
+            'end_time': end_date.split(';')[1] if not all_day else '23:59',
             'title': event.get('summary', 'No Title'),
-            'calendar_id': calendar_id
-        }
-        for event in events_result.get('items', []) if 'dateTime' in event['start']
-    ]
+            'calendar_id': calendar_id,
+            'all_day': all_day
+        })
+    return events
 
 
 def initialize_employee_events(employee_names):
-    return {name: [["" for _ in range(12)] for _ in range(31)] for name in employee_names}
+    return {name: [["" for _ in range(14)] for _ in range(31)] for name in employee_names}
 
 
 def assign_events_to_employees(employee_names, events):
@@ -75,6 +86,7 @@ def assign_events_to_employees(employee_names, events):
         title = event['title'].lower()
         start_date = event['start_date']
         start_time = event['start_time']
+        end_date = event['end_date']
         end_time = event['end_time']
         calendar_id = event['calendar_id']
         
@@ -86,53 +98,48 @@ def assign_events_to_employees(employee_names, events):
         employee_name = next((name for name in employee_names if name.lower() in title), None)
         
         if employee_name:
-            day = int(start_date.split('.')[0]) - 1  # Convert day to 0-based index
+            start_day = int(start_date.split('.')[0]) - 1  # Convert start day to 0-based index
+            end_day = int(end_date.split('.')[0]) - 1  # Convert end day to 0-based index
             
             if calendar_id == 'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com':
                 # BLT shifts
                 if 'krank' not in title and 'pause' not in title:
-                    employee_data[employee_name][day][0] = start_time
-                    employee_data[employee_name][day][1] = end_time
+                    employee_data[employee_name][start_day][0] = start_time
+                    employee_data[employee_name][start_day][1] = end_time
                 elif 'krank' in title:
-                    employee_data[employee_name][day][2] = start_time
-                    employee_data[employee_name][day][3] = end_time
+                    employee_data[employee_name][start_day][4] = start_time
+                    employee_data[employee_name][start_day][5] = end_time
                 elif 'pause' in title:
-                    employee_data[employee_name][day][5] = start_time
-                    employee_data[employee_name][day][6] = end_time
+                    employee_data[employee_name][start_day][10] = start_time
+                    employee_data[employee_name][start_day][11] = end_time
 
             elif calendar_id == 'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com':
                 # HC shifts
                 if 'krank' not in title and 'pause' not in title:
-                    employee_data[employee_name][day][0] = start_time
-                    employee_data[employee_name][day][1] = end_time
+                    employee_data[employee_name][start_day][2] = start_time
+                    employee_data[employee_name][start_day][3] = end_time
                 elif 'krank' in title:
-                    employee_data[employee_name][day][2] = start_time
-                    employee_data[employee_name][day][3] = end_time
+                    employee_data[employee_name][start_day][6] = start_time
+                    employee_data[employee_name][start_day][7] = end_time
                 elif 'pause' in title:
-                    employee_data[employee_name][day][5] = start_time
-                    employee_data[employee_name][day][6] = end_time
+                    employee_data[employee_name][start_day][12] = start_time
+                    employee_data[employee_name][start_day][13] = end_time
             
             elif calendar_id == 'ss2jdk18vevkib95bhpmebacgc@group.calendar.google.com':
                 # Urlaub (Holiday) shifts
-                start_day = int(start_date.split('.')[0]) - 1  # 0-based index
-                end_day = int(event['end_time'].split('.')[0]) - 1  # 0-based index
                 duration = end_day - start_day + 1
 
-                if duration >= 7:
-                    employee_data[employee_name][start_day][4] = '00:00'
-                    employee_data[employee_name][start_day][7] = '05:00'
-                    employee_data[employee_name][start_day + 1][4] = '00:00'
-                    employee_data[employee_name][start_day + 1][7] = '05:00'
-                else:
-                    employee_data[employee_name][start_day][4] = '00:00'
-                    employee_data[employee_name][start_day][7] = '05:00'
+                # Assign 5-hour shifts for Urlaub based on the duration
+                for i in range(duration):
+                    current_day = start_day + i
+                    if current_day < 31:  # Ensure day is within month range
+                        employee_data[employee_name][current_day][8] = '00:00'
+                        employee_data[employee_name][current_day][9] = '05:00'
 
-                # Add more shifts for longer holidays
-                for i in range(2, duration // 7 + 1):
-                    additional_day = start_day + (i - 1) * 7
-                    if additional_day < 31:
-                        employee_data[employee_name][additional_day][4] = '00:00'
-                        employee_data[employee_name][additional_day][7] = '05:00'
+                        # If duration is 7 days or more, add another 5-hour shift on the second day
+                        if duration >= 7 and i == 1:
+                            employee_data[employee_name][current_day][8] = '00:00'
+                            employee_data[employee_name][current_day][9] = '05:00'
 
     return employee_data
 
@@ -144,6 +151,7 @@ def save_employee_events(output_path, month_input, employee_events):
         file_path = os.path.join(month_dir, f"{name}_{month_input}.txt")
         with open(file_path, 'w') as file:
             for day in days:
+                # Ensure 14 columns per line
                 file.write('\t'.join(day) + '\n')
 
 
@@ -160,7 +168,8 @@ def main():
 
     calendar_ids = [
         'mcisnbiilvaj5481i9cnloga40@group.calendar.google.com',
-        'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com'
+        'o1l0or1r8bhuhjf6jr8t784tnc@group.calendar.google.com',
+        'ss2jdk18vevkib95bhpmebacgc@group.calendar.google.com'
     ]
 
     all_events = []
