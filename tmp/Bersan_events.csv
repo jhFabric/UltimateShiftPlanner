@@ -1,14 +1,14 @@
 day,weekday,start,end,time,shift
-2024-09-01,Sunday,13:45:00,18:00:00,4.25,Bersan
-2024-09-05,Thursday,14:45:00,20:00:00,5.25,Bersan
-2024-09-06,Friday,14:45:00,20:00:00,5.25,Bersan
-2024-09-07,Saturday,13:45:00,20:00:00,6.25,Bersan
-2024-09-08,Sunday,13:45:00,18:00:00,4.25,Bersan
-2024-09-12,Thursday,14:45:00,20:00:00,5.25,Bersan block
-2024-09-13,Friday,14:45:00,20:00:00,5.25,Bersan 
-2024-09-14,Saturday,13:45:00,20:00:00,6.25,Bersan block
-2024-09-15,Sunday,13:45:00,18:00:00,4.25,Bersan
-2024-09-19,Thursday,14:45:00,20:00:00,5.25,Bersan block
-2024-09-20,Friday,14:45:00,20:00:00,5.25,Bersan block
-2024-09-21,Saturday,13:45:00,20:00:00,6.25,Bersan block
-2024-09-22,Sunday,13:45:00,18:00:00,4.25,Bersan
+2024-10-10,Thursday,14:45:00,20:00:00,5.25,Bersan 
+2024-10-11,Friday,14:45:00,20:00:00,5.25,Bersan block
+2024-10-12,Saturday,13:45:00,20:00:00,6.25,Bersan
+2024-10-13,Sunday,13:45:00,18:00:00,4.25,Bersan
+2024-10-17,Thursday,14:45:00,20:00:00,5.25,Bersan
+2024-10-18,Friday,14:45:00,20:00:00,5.25,Bersan block
+2024-10-19,Saturday,13:45:00,20:00:00,6.25,Bersan
+2024-10-20,Sunday,13:45:00,18:00:00,4.25,Bersan
+2024-10-24,Thursday,14:45:00,20:00:00,5.25,Bersan
+2024-10-25,Friday,14:45:00,20:00:00,5.25,Bersan block
+2024-10-26,Saturday,13:45:00,20:00:00,6.25,Bersan block
+2024-10-27,Sunday,13:45:00,18:00:00,4.25,Bersan
+2024-10-31,Thursday,14:45:00,20:00:00,5.25,Bersan

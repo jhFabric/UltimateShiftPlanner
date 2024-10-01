@@ -1,45 +1,54 @@
 day,weekday,start,end,time,shift
-2024-09-01,Sunday,05:30:00,20:30:00,15.0,BLOCK Yannick
-2024-09-02,Monday,00:00:00,00:00:00,72.0,Urlaub Yannick
-2024-09-05,Thursday,12:45:00,18:00:00,5.25,Yannick
-2024-09-05,Thursday,18:15:00,21:45:00,3.5,BLOCK Yannick
-2024-09-06,Friday,00:00:00,00:00:00,48.0,Urlaub Yannick
-2024-09-08,Sunday,07:15:00,13:15:00,6.0,Yannick
-2024-09-08,Sunday,11:45:00,16:00:00,4.25,Yannick
-2024-09-08,Sunday,13:00:00,19:00:00,6.0,Yannick
-2024-09-09,Monday,14:15:00,20:00:00,5.75,Yannick
-2024-09-10,Tuesday,14:15:00,20:00:00,5.75,Yannick
-2024-09-11,Wednesday,13:15:00,20:00:00,6.75,Yannick
-2024-09-12,Thursday,12:45:00,18:00:00,5.25,Yannick
-2024-09-12,Thursday,18:30:00,21:30:00,3.0,BLOCK Yannick
-2024-09-13,Friday,10:45:00,16:15:00,5.5,Yannick
-2024-09-13,Friday,12:45:00,18:00:00,5.25,Yannick
-2024-09-13,Friday,16:00:00,21:30:00,5.5,Yannick
-2024-09-14,Saturday,07:15:00,14:00:00,6.75,Yannick
-2024-09-14,Saturday,11:45:00,18:00:00,6.25,Yannick
-2024-09-14,Saturday,13:45:00,20:30:00,6.75,Yannick
-2024-09-15,Sunday,06:30:00,12:45:00,6.25,BLOCK Yannick
-2024-09-15,Sunday,13:00:00,19:00:00,6.0,Yannick
-2024-09-16,Monday,07:00:00,21:30:00,14.5,BLOCK Yannick
-2024-09-17,Tuesday,14:15:00,20:30:00,6.25,Yannick
-2024-09-18,Wednesday,09:30:00,20:30:00,11.0,BLOCK Yannick
-2024-09-19,Thursday,12:45:00,18:00:00,5.25,Yannick
-2024-09-19,Thursday,18:15:00,20:30:00,2.25,BLOCK Yannick
-2024-09-20,Friday,10:15:00,12:30:00,2.25,BLOCK Yannick
-2024-09-20,Friday,12:45:00,18:00:00,5.25,Yannick
-2024-09-20,Friday,18:30:00,21:30:00,3.0,BLOCK Yannick
-2024-09-21,Saturday,06:30:00,11:30:00,5.0,BLOCK Yannick
-2024-09-21,Saturday,11:45:00,18:00:00,6.25,Yannick
-2024-09-21,Saturday,13:45:00,20:30:00,6.75,Yannick
-2024-09-22,Sunday,07:15:00,13:15:00,6.0,Yannick
-2024-09-22,Sunday,11:45:00,16:00:00,4.25,Yannick
-2024-09-22,Sunday,13:00:00,19:00:00,6.0,Yannick
-2024-09-23,Monday,14:15:00,20:00:00,5.75,Yannick
-2024-09-24,Tuesday,14:15:00,20:30:00,6.25,Yannick
-2024-09-25,Wednesday,10:00:00,21:30:00,11.5,BLOCK Yannick
-2024-09-26,Thursday,12:45:00,18:00:00,5.25,Yannick
-2024-09-26,Thursday,18:30:00,21:30:00,3.0,BLOCK Yannick
-2024-09-27,Friday,08:30:00,21:30:00,13.0,BLOCK Yannick
-2024-09-28,Saturday,06:00:00,21:30:00,15.5,BLOCK Yannick
-2024-09-29,Sunday,06:00:00,21:30:00,15.5,BLOCK Yannick
-2024-09-30,Monday,14:15:00,20:00:00,5.75,Yannick
+2024-10-01,Tuesday,09:30:00,21:30:00,12.0,BLOCK Yannick
+2024-10-02,Wednesday,09:30:00,21:30:00,12.0,BLOCK Yannick
+2024-10-03,Thursday,10:00:00,21:30:00,11.5,BLOCK Yannick
+2024-10-04,Friday,10:45:00,16:15:00,5.5,Yannick
+2024-10-04,Friday,16:30:00,21:30:00,5.0,BLOCK Yannick
+2024-10-05,Saturday,05:30:00,11:00:00,5.5,BLOCK Yannick
+2024-10-05,Saturday,11:45:00,18:00:00,6.25,Yannick
+2024-10-06,Sunday,07:15:00,13:15:00,6.0,Yannick
+2024-10-06,Sunday,11:45:00,16:00:00,4.25,Yannick
+2024-10-06,Sunday,13:00:00,19:00:00,6.0,Yannick
+2024-10-07,Monday,14:15:00,20:00:00,5.75,Yannick
+2024-10-08,Tuesday,14:15:00,20:00:00,5.75,Yannick
+2024-10-09,Wednesday,13:15:00,20:00:00,6.75,Yannick
+2024-10-10,Thursday,12:45:00,18:00:00,5.25,Yannick
+2024-10-11,Friday,10:45:00,16:15:00,5.5,Yannick
+2024-10-11,Friday,12:45:00,18:00:00,5.25,Yannick
+2024-10-11,Friday,16:00:00,21:30:00,5.5,Yannick
+2024-10-12,Saturday,11:45:00,18:00:00,6.25,Yannick
+2024-10-12,Saturday,13:45:00,20:30:00,6.75,Yannick
+2024-10-13,Sunday,07:15:00,13:15:00,6.0,Yannick
+2024-10-13,Sunday,11:45:00,16:00:00,4.25,Yannick
+2024-10-13,Sunday,13:00:00,19:00:00,6.0,Yannick
+2024-10-14,Monday,09:00:00,14:00:00,5.0,BLOCK Yannick
+2024-10-14,Monday,14:15:00,20:00:00,5.75,Yannick
+2024-10-15,Tuesday,07:30:00,14:00:00,6.5,BLOCK Yannick
+2024-10-15,Tuesday,14:15:00,20:30:00,6.25,Yannick
+2024-10-16,Wednesday,08:30:00,14:00:00,5.5,BLOCK Yannick
+2024-10-16,Wednesday,14:15:00,20:00:00,5.75,Yannick
+2024-10-17,Thursday,08:00:00,12:30:00,4.5,BLOCK Yannick
+2024-10-17,Thursday,12:45:00,18:00:00,5.25,Yannick
+2024-10-18,Friday,09:00:00,12:30:00,3.5,BLOCK Yannick
+2024-10-18,Friday,12:45:00,18:00:00,5.25,Yannick
+2024-10-19,Saturday,05:30:00,21:30:00,16.0,BLOCK Yannick
+2024-10-20,Sunday,07:15:00,13:15:00,6.0,Yannick
+2024-10-20,Sunday,11:45:00,16:00:00,4.25,Yannick
+2024-10-20,Sunday,13:00:00,19:00:00,6.0,Yannick
+2024-10-21,Monday,08:30:00,14:00:00,5.5,BLOCK Yannick
+2024-10-21,Monday,14:15:00,20:00:00,5.75,Yannick
+2024-10-22,Tuesday,07:00:00,21:30:00,14.5,BLOCK Yannick
+2024-10-23,Wednesday,08:00:00,14:00:00,6.0,BLOCK Yannick
+2024-10-23,Wednesday,14:15:00,20:00:00,5.75,Yannick
+2024-10-24,Thursday,08:00:00,12:30:00,4.5,BLOCK Yannick
+2024-10-24,Thursday,12:45:00,18:00:00,5.25,Yannick
+2024-10-25,Friday,08:00:00,21:30:00,13.5,BLOCK Yannick
+2024-10-26,Saturday,11:45:00,18:00:00,6.25,Yannick
+2024-10-26,Saturday,18:00:00,21:30:00,3.5,BLOCK Yannick
+2024-10-27,Sunday,08:15:00,14:15:00,6.0,Yannick
+2024-10-27,Sunday,12:45:00,17:00:00,4.25,Yannick
+2024-10-27,Sunday,14:00:00,20:00:00,6.0,Yannick
+2024-10-28,Monday,15:15:00,21:00:00,5.75,Yannick
+2024-10-29,Tuesday,15:15:00,21:30:00,6.25,Yannick
+2024-10-30,Wednesday,09:30:00,22:30:00,13.0,BLOCK Yannick
+2024-10-31,Thursday,08:30:00,22:30:00,14.0,BLOCK Yannick
